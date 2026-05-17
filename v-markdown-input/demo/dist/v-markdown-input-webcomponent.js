@@ -1,16 +1,23 @@
 /**
- * OverType v2.3.5
- * A lightweight markdown editor library with perfect WYSIWYG alignment
- * @license MIT
- * @author David Miranda
- * https://github.com/panphora/overtype
+ * v-markdown-input v0.1.0
+ * Standalone web component scaffold derived from OverType by David Miranda
+ * Original project: https://github.com/panphora/overtype
+ * License preserved: MIT
  */
-var OverTypeEditor = (() => {
+var VMarkdownInputElement = (() => {
+  var __create = Object.create;
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+  }) : x)(function(x) {
+    if (typeof require !== "undefined")
+      return require.apply(this, arguments);
+    throw Error('Dynamic require of "' + x + '" is not supported');
+  });
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -23,20 +30,31 @@ var OverTypeEditor = (() => {
     }
     return to;
   };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-  var __publicField = (obj, key, value) => {
-    __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-    return value;
-  };
 
-  // src/overtype-webcomponent.js
-  var overtype_webcomponent_exports = {};
-  __export(overtype_webcomponent_exports, {
-    default: () => overtype_webcomponent_default
+  // src/v-markdown-input-webcomponent.js
+  var v_markdown_input_webcomponent_exports = {};
+  __export(v_markdown_input_webcomponent_exports, {
+    VMarkdownInputElement: () => VMarkdownInputElement,
+    default: () => v_markdown_input_webcomponent_default
   });
 
   // src/parser.js
   var MarkdownParser = class {
+    // Track link index for anchor naming
+    static linkIndex = 0;
+    // Global code highlighter function
+    static codeHighlighter = null;
+    // Custom syntax processor function
+    static customSyntax = null;
     /**
      * Reset link index (call before parsing a new document)
      */
@@ -195,8 +213,8 @@ var OverTypeEditor = (() => {
      * @returns {string} HTML with italic styling
      */
     static parseItalic(html) {
-      html = html.replace(new RegExp("(?<![\\*>])\\*(?!\\*)(.+?)(?<!\\*)\\*(?!\\*)", "g"), '<em><span class="syntax-marker">*</span>$1<span class="syntax-marker">*</span></em>');
-      html = html.replace(new RegExp("(?<=^|\\s)_(?!_)(.+?)(?<!_)_(?!_)(?=\\s|$)", "g"), '<em><span class="syntax-marker">_</span>$1<span class="syntax-marker">_</span></em>');
+      html = html.replace(/(?<![\*>])\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em><span class="syntax-marker">*</span>$1<span class="syntax-marker">*</span></em>');
+      html = html.replace(/(?<=^|\s)_(?!_)(.+?)(?<!_)_(?!_)(?=\s|$)/g, '<em><span class="syntax-marker">_</span>$1<span class="syntax-marker">_</span></em>');
       return html;
     }
     /**
@@ -206,8 +224,8 @@ var OverTypeEditor = (() => {
      * @returns {string} HTML with strikethrough styling
      */
     static parseStrikethrough(html) {
-      html = html.replace(new RegExp("(?<!~)~~(?!~)(.+?)(?<!~)~~(?!~)", "g"), '<del><span class="syntax-marker">~~</span>$1<span class="syntax-marker">~~</span></del>');
-      html = html.replace(new RegExp("(?<!~)~(?!~)(.+?)(?<!~)~(?!~)", "g"), '<del><span class="syntax-marker">~</span>$1<span class="syntax-marker">~</span></del>');
+      html = html.replace(/(?<!~)~~(?!~)(.+?)(?<!~)~~(?!~)/g, '<del><span class="syntax-marker">~~</span>$1<span class="syntax-marker">~~</span></del>');
+      html = html.replace(/(?<!~)~(?!~)(.+?)(?<!~)~(?!~)/g, '<del><span class="syntax-marker">~</span>$1<span class="syntax-marker">~</span></del>');
       return html;
     }
     /**
@@ -216,7 +234,7 @@ var OverTypeEditor = (() => {
      * @returns {string} HTML with code styling
      */
     static parseInlineCode(html) {
-      return html.replace(new RegExp("(?<!`)(`+)(?!`)((?:(?!\\1).)+?)(\\1)(?!`)", "g"), '<code><span class="syntax-marker">$1</span>$2<span class="syntax-marker">$3</span></code>');
+      return html.replace(/(?<!`)(`+)(?!`)((?:(?!\1).)+?)(\1)(?!`)/g, '<code><span class="syntax-marker">$1</span>$2<span class="syntax-marker">$3</span></code>');
     }
     /**
      * Sanitize URL to prevent XSS attacks
@@ -270,7 +288,7 @@ var OverTypeEditor = (() => {
         const urlEnd = urlStart + linkMatch[2].length;
         protectedRegions.push({ start: urlStart, end: urlEnd });
       }
-      const codeRegex = new RegExp("(?<!`)(`+)(?!`)((?:(?!\\1).)+?)(\\1)(?!`)", "g");
+      const codeRegex = /(?<!`)(`+)(?!`)((?:(?!\1).)+?)(\1)(?!`)/g;
       let codeMatch;
       const codeMatches = [];
       while ((codeMatch = codeRegex.exec(text)) !== null) {
@@ -617,6 +635,14 @@ var OverTypeEditor = (() => {
       return processed;
     }
     /**
+     * List pattern definitions
+     */
+    static LIST_PATTERNS = {
+      bullet: /^(\s*)([-*+])\s+(.*)$/,
+      numbered: /^(\s*)(\d+)\.\s+(.*)$/,
+      checkbox: /^(\s*)-\s+\[([ x])\]\s+(.*)$/
+    };
+    /**
      * Get list context at cursor position
      * @param {string} text - Full text content
      * @param {number} cursorPosition - Current cursor position
@@ -747,20 +773,6 @@ var OverTypeEditor = (() => {
       return result.join("\n");
     }
   };
-  // Track link index for anchor naming
-  __publicField(MarkdownParser, "linkIndex", 0);
-  // Global code highlighter function
-  __publicField(MarkdownParser, "codeHighlighter", null);
-  // Custom syntax processor function
-  __publicField(MarkdownParser, "customSyntax", null);
-  /**
-   * List pattern definitions
-   */
-  __publicField(MarkdownParser, "LIST_PATTERNS", {
-    bullet: /^(\s*)([-*+])\s+(.*)$/,
-    numbered: /^(\s*)(\d+)\.\s+(.*)$/,
-    checkbox: /^(\s*)-\s+\[([ x])\]\s+(.*)$/
-  });
 
   // src/shortcuts.js
   var ShortcutsManager = class {
@@ -994,7 +1006,7 @@ var OverTypeEditor = (() => {
     if (themeName !== "auto")
       return themeName;
     const mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
-    return (mq == null ? void 0 : mq.matches) ? "cave" : "solar";
+    return mq?.matches ? "cave" : "solar";
   }
   function themeToCSSVars(colors, previewColors) {
     const vars = [];
@@ -1918,20 +1930,20 @@ var OverTypeEditor = (() => {
   `;
   }
 
-  // node_modules/.pnpm/markdown-actions@1.1.2/node_modules/markdown-actions/dist/markdown-actions.esm.js
+  // node_modules/markdown-actions/dist/markdown-actions.esm.js
   var __defProp2 = Object.defineProperty;
   var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __hasOwnProp2 = Object.prototype.hasOwnProperty;
   var __propIsEnum = Object.prototype.propertyIsEnumerable;
-  var __defNormalProp2 = (obj, key, value) => key in obj ? __defProp2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __spreadValues = (a, b) => {
     for (var prop in b || (b = {}))
       if (__hasOwnProp2.call(b, prop))
-        __defNormalProp2(a, prop, b[prop]);
+        __defNormalProp(a, prop, b[prop]);
     if (__getOwnPropSymbols)
       for (var prop of __getOwnPropSymbols(b)) {
         if (__propIsEnum.call(b, prop))
-          __defNormalProp2(a, prop, b[prop]);
+          __defNormalProp(a, prop, b[prop]);
       }
     return a;
   };
@@ -2945,12 +2957,11 @@ ${blockSuffix}` : suffix;
      * Update active states of toolbar buttons
      */
     updateButtonStates() {
-      var _a;
       try {
-        const activeFormats = ((_a = getActiveFormats2) == null ? void 0 : _a(
+        const activeFormats = getActiveFormats2?.(
           this.editor.textarea,
           this.editor.textarea.selectionStart
-        )) || [];
+        ) || [];
         Object.entries(this.buttons).forEach(([name, button]) => {
           if (name === "viewMode")
             return;
@@ -2985,6 +2996,15 @@ ${blockSuffix}` : suffix;
               break;
             case "h3":
               isActive = activeFormats.includes("header-3");
+              break;
+            case "spellcheck":
+              isActive = !!this.editor.options.spellcheck;
+              break;
+            case "autoResize":
+              isActive = !!this.editor.options.autoResize;
+              break;
+            case "stats":
+              isActive = !!this.editor.options.showStats;
               break;
           }
           button.classList.toggle("active", isActive);
@@ -3024,7 +3044,7 @@ ${blockSuffix}` : suffix;
     }
   };
 
-  // node_modules/.pnpm/@floating-ui+utils@0.2.11/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs
+  // node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs
   var min = Math.min;
   var max = Math.max;
   var round = Math.round;
@@ -3152,7 +3172,7 @@ ${blockSuffix}` : suffix;
     };
   }
 
-  // node_modules/.pnpm/@floating-ui+core@1.7.5/node_modules/@floating-ui/core/dist/floating-ui.core.mjs
+  // node_modules/@floating-ui/core/dist/floating-ui.core.mjs
   function computeCoordsFromPlacement(_ref, placement, rtl) {
     let {
       reference,
@@ -3603,7 +3623,7 @@ ${blockSuffix}` : suffix;
     };
   };
 
-  // node_modules/.pnpm/@floating-ui+utils@0.2.11/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs
+  // node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs
   function hasWindow() {
     return typeof window !== "undefined";
   }
@@ -3759,7 +3779,7 @@ ${blockSuffix}` : suffix;
     return win.parent && Object.getPrototypeOf(win.parent) ? win.frameElement : null;
   }
 
-  // node_modules/.pnpm/@floating-ui+dom@1.7.6/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs
+  // node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs
   function getCssDimensions(element) {
     const css = getComputedStyle2(element);
     let width = parseFloat(css.width) || 0;
@@ -4461,6 +4481,25 @@ ${blockSuffix}` : suffix;
   <path stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.063 6.188L9 2.25l3.938 3.938"></path>
   <path stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2.25v10.125"></path>
 </svg>`;
+  var spellcheckIcon = `<svg viewBox="0 0 18 18">
+  <path stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M3.5 12.5 7.2 4.5 10.9 12.5"></path>
+  <line stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" x1="4.8" x2="9.6" y1="10" y2="10"></line>
+  <polyline stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" points="10.8 11.2 12.8 13.1 15.8 8.9"></polyline>
+</svg>`;
+  var autoResizeIcon = `<svg viewBox="0 0 18 18">
+  <polyline stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" points="9 2.5 6.2 5.3 11.8 5.3"></polyline>
+  <line stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" x1="9" x2="9" y1="3.2" y2="8"></line>
+  <polyline stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" points="9 15.5 6.2 12.7 11.8 12.7"></polyline>
+  <line stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" x1="9" x2="9" y1="9.8" y2="14.6"></line>
+  <rect stroke="currentColor" fill="none" stroke-width="1.4" x="3.5" y="6.3" width="11" height="5.4" rx="1.2"></rect>
+</svg>`;
+  var statsIcon = `<svg viewBox="0 0 18 18">
+  <line stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" x1="3" x2="3" y1="14.5" y2="4"></line>
+  <line stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" x1="3" x2="15" y1="14.5" y2="14.5"></line>
+  <rect fill="currentColor" x="5" y="9.5" width="2.2" height="4"></rect>
+  <rect fill="currentColor" x="8.4" y="6.8" width="2.2" height="6.7"></rect>
+  <rect fill="currentColor" x="11.8" y="4.5" width="2.2" height="9"></rect>
+</svg>`;
   var eyeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="none"></path>
   <circle cx="12" cy="12" r="3" fill="none"></circle>
@@ -4590,18 +4629,16 @@ ${blockSuffix}` : suffix;
       icon: uploadIcon,
       title: "Upload File",
       action: ({ editor }) => {
-        var _a, _b;
-        if (!((_a = editor.options.fileUpload) == null ? void 0 : _a.enabled))
+        if (!editor.options.fileUpload?.enabled)
           return;
         const input = document.createElement("input");
         input.type = "file";
         input.multiple = true;
-        if (((_b = editor.options.fileUpload.mimeTypes) == null ? void 0 : _b.length) > 0) {
+        if (editor.options.fileUpload.mimeTypes?.length > 0) {
           input.accept = editor.options.fileUpload.mimeTypes.join(",");
         }
         input.onchange = () => {
-          var _a2;
-          if (!((_a2 = input.files) == null ? void 0 : _a2.length))
+          if (!input.files?.length)
             return;
           const dt = new DataTransfer();
           for (const f of input.files)
@@ -4609,6 +4646,39 @@ ${blockSuffix}` : suffix;
           editor._handleDataTransfer(dt);
         };
         input.click();
+      }
+    },
+    spellcheck: {
+      name: "spellcheck",
+      actionId: "toggleSpellcheck",
+      icon: spellcheckIcon,
+      title: "Toggle Spellcheck",
+      action: ({ editor }) => {
+        if (typeof editor.toggleSpellcheck === "function") {
+          editor.toggleSpellcheck();
+        }
+      }
+    },
+    autoResize: {
+      name: "autoResize",
+      actionId: "toggleAutoResize",
+      icon: autoResizeIcon,
+      title: "Toggle Auto Resize",
+      action: ({ editor }) => {
+        if (typeof editor.toggleAutoResize === "function") {
+          editor.toggleAutoResize();
+        }
+      }
+    },
+    stats: {
+      name: "stats",
+      actionId: "toggleStats",
+      icon: statsIcon,
+      title: "Toggle Stats",
+      action: ({ editor }) => {
+        if (typeof editor.toggleStats === "function") {
+          editor.toggleStats();
+        }
       }
     },
     viewMode: {
@@ -4636,6 +4706,9 @@ ${blockSuffix}` : suffix;
     toolbarButtons.separator,
     toolbarButtons.quote,
     toolbarButtons.separator,
+    toolbarButtons.spellcheck,
+    toolbarButtons.autoResize,
+    toolbarButtons.stats,
     toolbarButtons.viewMode
   ];
 
@@ -4657,10 +4730,10 @@ ${blockSuffix}` : suffix;
     if (!Array.isArray(list))
       return null;
     return list.map((btn) => ({
-      name: (btn == null ? void 0 : btn.name) || null,
-      actionId: (btn == null ? void 0 : btn.actionId) || (btn == null ? void 0 : btn.name) || null,
-      icon: (btn == null ? void 0 : btn.icon) || null,
-      title: (btn == null ? void 0 : btn.title) || null
+      name: btn?.name || null,
+      actionId: btn?.actionId || btn?.name || null,
+      icon: btn?.icon || null,
+      title: btn?.title || null
     }));
   }
   function toolbarButtonsChanged(prevButtons, nextButtons) {
@@ -4679,7 +4752,35 @@ ${blockSuffix}` : suffix;
     }
     return false;
   }
-  var _OverType = class _OverType {
+  var SCROLL_SYNC_SETTLE_MS = 180;
+  function compactToolbarButtons(buttons) {
+    const compact = [];
+    for (const button of buttons || []) {
+      if (!button)
+        continue;
+      if (button.name === "separator") {
+        if (compact.length === 0 || compact[compact.length - 1]?.name === "separator") {
+          continue;
+        }
+      }
+      compact.push(button);
+    }
+    if (compact[compact.length - 1]?.name === "separator") {
+      compact.pop();
+    }
+    return compact;
+  }
+  var OverType = class _OverType {
+    // Static properties
+    static instances = /* @__PURE__ */ new WeakMap();
+    static stylesInjected = false;
+    static globalListenersInitialized = false;
+    static instanceCount = 0;
+    static _autoMediaQuery = null;
+    static _autoMediaListener = null;
+    static _autoInstances = /* @__PURE__ */ new Set();
+    static _globalAutoTheme = false;
+    static _globalAutoCustomColors = null;
     /**
      * Constructor - Always returns an array of instances
      * @param {string|Element|NodeList|Array} target - Target element(s)
@@ -4726,6 +4827,8 @@ ${blockSuffix}` : suffix;
       this.options = this._mergeOptions(options);
       this.instanceId = ++_OverType.instanceCount;
       this.initialized = false;
+      this._scrollSyncFrameId = null;
+      this._scrollSyncUntil = 0;
       _OverType.injectStyles();
       _OverType.initGlobalListeners();
       const container = element.querySelector(".overtype-container");
@@ -4787,6 +4890,8 @@ ${blockSuffix}` : suffix;
         onChange: null,
         onKeydown: null,
         onRender: null,
+        onAutoResizeChange: null,
+        onShowStatsChange: null,
         // Features
         showActiveLineRaw: false,
         showStats: false,
@@ -4963,20 +5068,129 @@ ${blockSuffix}` : suffix;
       this.textarea.setAttribute("autocomplete", "off");
       this.textarea.setAttribute("autocorrect", "off");
       this.textarea.setAttribute("autocapitalize", "off");
-      this.textarea.setAttribute("spellcheck", String(this.options.spellcheck));
+      this._applyNativeSpellcheck();
       this.textarea.setAttribute("data-gramm", "false");
       this.textarea.setAttribute("data-gramm_editor", "false");
       this.textarea.setAttribute("data-enable-grammarly", "false");
+    }
+    /**
+     * Whether native browser spellcheck should be rendered on the textarea
+     * @returns {boolean}
+     * @private
+     */
+    _shouldRenderNativeSpellcheck() {
+      return !!this.options.spellcheck;
+    }
+    /**
+     * Apply the effective native spellcheck state to the textarea
+     * @private
+     */
+    _applyNativeSpellcheck() {
+      if (!this.textarea)
+        return;
+      this.textarea.setAttribute("spellcheck", String(this._shouldRenderNativeSpellcheck()));
+    }
+    /**
+     * Refresh native spellcheck state on the current textarea.
+     * @private
+     */
+    _refreshNativeSpellcheck() {
+      if (!this.textarea)
+        return;
+      this._applyNativeSpellcheck();
+    }
+    /**
+     * Sync the preview viewport to the textarea viewport
+     * @private
+     */
+    _syncPreviewScroll() {
+      if (!this.textarea || !this.preview)
+        return;
+      this.preview.scrollTop = this.textarea.scrollTop;
+      this.preview.scrollLeft = this.textarea.scrollLeft;
+    }
+    /**
+     * Stop the active scroll-sync animation loop
+     * @private
+     */
+    _stopScrollSyncLoop() {
+      if (this._scrollSyncFrameId) {
+        cancelAnimationFrame(this._scrollSyncFrameId);
+        this._scrollSyncFrameId = null;
+      }
+      this._scrollSyncUntil = 0;
+    }
+    /**
+     * Keep preview scroll tightly locked to textarea scroll while momentum scrolling settles
+     * @private
+     */
+    _startScrollSyncLoop() {
+      const now = typeof performance !== "undefined" && typeof performance.now === "function" ? performance.now() : Date.now();
+      this._scrollSyncUntil = now + SCROLL_SYNC_SETTLE_MS;
+      if (this._scrollSyncFrameId)
+        return;
+      const tick = () => {
+        this._syncPreviewScroll();
+        const currentTime = typeof performance !== "undefined" && typeof performance.now === "function" ? performance.now() : Date.now();
+        if (currentTime < this._scrollSyncUntil) {
+          this._scrollSyncFrameId = requestAnimationFrame(tick);
+          return;
+        }
+        this._scrollSyncFrameId = null;
+      };
+      this._scrollSyncFrameId = requestAnimationFrame(tick);
+    }
+    /**
+     * Convert wheel delta units into pixels
+     * @param {number} delta
+     * @param {number} deltaMode
+     * @param {'x'|'y'} axis
+     * @returns {number}
+     * @private
+     */
+    _normalizeWheelDelta(delta, deltaMode, axis) {
+      if (deltaMode === 1) {
+        const lineHeight = parseFloat(getComputedStyle(this.textarea).lineHeight) || 16;
+        return delta * lineHeight;
+      }
+      if (deltaMode === 2) {
+        return delta * (axis === "y" ? this.textarea.clientHeight : this.textarea.clientWidth);
+      }
+      return delta;
+    }
+    /**
+     * Handle wheel scrolling directly so preview and textarea move in the same frame
+     * @param {WheelEvent} event
+     * @private
+     */
+    handleWheel(event) {
+      const mode = this.container?.dataset.mode;
+      if (!this.textarea || !this.preview || mode === "plain" || mode === "preview" || event.ctrlKey)
+        return;
+      const maxTop = Math.max(0, this.textarea.scrollHeight - this.textarea.clientHeight);
+      const maxLeft = Math.max(0, this.textarea.scrollWidth - this.textarea.clientWidth);
+      const deltaY = this._normalizeWheelDelta(event.deltaY, event.deltaMode, "y");
+      const deltaX = this._normalizeWheelDelta(event.deltaX, event.deltaMode, "x");
+      const nextTop = Math.max(0, Math.min(maxTop, this.textarea.scrollTop + deltaY));
+      const nextLeft = Math.max(0, Math.min(maxLeft, this.textarea.scrollLeft + deltaX));
+      const willScrollY = nextTop !== this.textarea.scrollTop;
+      const willScrollX = nextLeft !== this.textarea.scrollLeft;
+      if (!willScrollY && !willScrollX)
+        return;
+      event.preventDefault();
+      this.textarea.scrollTop = nextTop;
+      this.textarea.scrollLeft = nextLeft;
+      this._syncPreviewScroll();
+      this._startScrollSyncLoop();
     }
     /**
      * Create and setup toolbar
      * @private
      */
     _createToolbar() {
-      var _a;
       let toolbarButtons2 = this.options.toolbarButtons || defaultToolbarButtons;
-      if (((_a = this.options.fileUpload) == null ? void 0 : _a.enabled) && !toolbarButtons2.some((b) => (b == null ? void 0 : b.name) === "upload")) {
-        const viewModeIdx = toolbarButtons2.findIndex((b) => (b == null ? void 0 : b.name) === "viewMode");
+      if (this.options.fileUpload?.enabled && !toolbarButtons2.some((b) => b?.name === "upload")) {
+        const viewModeIdx = toolbarButtons2.findIndex((b) => b?.name === "viewMode");
         if (viewModeIdx !== -1) {
           toolbarButtons2 = [...toolbarButtons2];
           toolbarButtons2.splice(viewModeIdx, 0, toolbarButtons.separator, toolbarButtons.upload);
@@ -4984,8 +5198,10 @@ ${blockSuffix}` : suffix;
           toolbarButtons2 = [...toolbarButtons2, toolbarButtons.separator, toolbarButtons.upload];
         }
       }
+      toolbarButtons2 = compactToolbarButtons(toolbarButtons2);
       this.toolbar = new Toolbar(this, { toolbarButtons: toolbarButtons2 });
       this.toolbar.create();
+      this.toolbar.updateButtonStates();
       this._toolbarSelectionListener = () => {
         if (this.toolbar) {
           this.toolbar.updateButtonStates();
@@ -5019,12 +5235,11 @@ ${blockSuffix}` : suffix;
      * @private
      */
     _rebuildActionsMap() {
-      var _a;
       this.actionsById = buildActionsMap(defaultToolbarButtons);
       if (this.options.toolbarButtons) {
         Object.assign(this.actionsById, buildActionsMap(this.options.toolbarButtons));
       }
-      if ((_a = this.options.fileUpload) == null ? void 0 : _a.enabled) {
+      if (this.options.fileUpload?.enabled) {
         Object.assign(this.actionsById, buildActionsMap([toolbarButtons.upload]));
       }
     }
@@ -5033,6 +5248,7 @@ ${blockSuffix}` : suffix;
      * @private
      */
     _applyOptions() {
+      this._refreshNativeSpellcheck();
       if (this.options.autofocus) {
         this.textarea.focus();
       }
@@ -5043,7 +5259,7 @@ ${blockSuffix}` : suffix;
           this._updateAutoHeight();
         }
       } else {
-        this.container.classList.remove("overtype-auto-resize");
+        this._destroyAutoResize();
       }
       if (this.options.toolbar && !this.toolbar) {
         this._createToolbar();
@@ -5083,15 +5299,13 @@ ${blockSuffix}` : suffix;
       this.fileUploadInitialized = true;
     }
     _handleFilePaste(e) {
-      var _a, _b;
-      if (!((_b = (_a = e == null ? void 0 : e.clipboardData) == null ? void 0 : _a.files) == null ? void 0 : _b.length))
+      if (!e?.clipboardData?.files?.length)
         return;
       e.preventDefault();
       this._handleDataTransfer(e.clipboardData);
     }
     _handleFileDrop(e) {
-      var _a, _b;
-      if (!((_b = (_a = e == null ? void 0 : e.dataTransfer) == null ? void 0 : _a.files) == null ? void 0 : _b.length))
+      if (!e?.dataTransfer?.files?.length)
         return;
       e.preventDefault();
       this._handleDataTransfer(e.dataTransfer);
@@ -5394,8 +5608,8 @@ ${blockSuffix}` : suffix;
      * @private
      */
     handleScroll(event) {
-      this.preview.scrollTop = this.textarea.scrollTop;
-      this.preview.scrollLeft = this.textarea.scrollLeft;
+      this._syncPreviewScroll();
+      this._startScrollSyncLoop();
     }
     /**
      * Get editor content
@@ -5427,11 +5641,10 @@ ${blockSuffix}` : suffix;
      * @returns {Promise<boolean>} Whether the action was executed successfully
      */
     async performAction(actionId, event = null) {
-      var _a;
       const textarea = this.textarea;
       if (!textarea)
         return false;
-      const action = (_a = this.actionsById) == null ? void 0 : _a[actionId];
+      const action = this.actionsById?.[actionId];
       if (!action) {
         console.warn(`OverType: Unknown action "${actionId}"`);
         return false;
@@ -5509,8 +5722,7 @@ ${blockSuffix}` : suffix;
      * @param {Object} options - New options to apply
      */
     reinit(options = {}) {
-      var _a;
-      const prevToolbarButtons = (_a = this.options) == null ? void 0 : _a.toolbarButtons;
+      const prevToolbarButtons = this.options?.toolbarButtons;
       this.options = this._mergeOptions({ ...this.options, ...options });
       const toolbarNeedsRebuild = this.toolbar && this.options.toolbar && toolbarButtonsChanged(prevToolbarButtons, this.options.toolbarButtons);
       this._rebuildActionsMap();
@@ -5585,6 +5797,59 @@ ${blockSuffix}` : suffix;
       this.updatePreview();
     }
     /**
+     * Enable or disable native browser spellcheck on the textarea
+     * @param {boolean} enabled - Whether spellcheck should be enabled
+     * @returns {this} Returns this for chaining
+     */
+    setSpellcheck(enabled = true) {
+      const normalized = !!enabled;
+      this.options.spellcheck = normalized;
+      this._refreshNativeSpellcheck();
+      if (this.toolbar?.updateButtonStates) {
+        this.toolbar.updateButtonStates();
+      }
+      if (typeof this.options.onSpellcheckChange === "function") {
+        this.options.onSpellcheckChange(normalized, this);
+      }
+      return this;
+    }
+    /**
+     * Enable or disable auto-resize behavior
+     * @param {boolean} enabled - Whether auto-resize should be enabled
+     * @returns {this} Returns this for chaining
+     */
+    setAutoResize(enabled = true) {
+      const normalized = !!enabled;
+      const didChange = this.options.autoResize !== normalized;
+      this.options.autoResize = normalized;
+      if (normalized) {
+        this._setupAutoResize();
+      } else {
+        this._destroyAutoResize();
+      }
+      if (this.toolbar?.updateButtonStates) {
+        this.toolbar.updateButtonStates();
+      }
+      if (didChange && typeof this.options.onAutoResizeChange === "function") {
+        this.options.onAutoResizeChange(normalized, this);
+      }
+      return this;
+    }
+    /**
+     * Toggle auto-resize behavior
+     * @returns {this} Returns this for chaining
+     */
+    toggleAutoResize() {
+      return this.setAutoResize(!this.options.autoResize);
+    }
+    /**
+     * Toggle native browser spellcheck on the textarea
+     * @returns {this} Returns this for chaining
+     */
+    toggleSpellcheck() {
+      return this.setSpellcheck(!this.options.spellcheck);
+    }
+    /**
      * Update stats bar
      * @private
      */
@@ -5623,11 +5888,40 @@ ${blockSuffix}` : suffix;
      * @private
      */
     _setupAutoResize() {
+      if (!this._autoResizeInputHandler) {
+        this._autoResizeInputHandler = () => this._updateAutoHeight();
+      }
+      if (!this._autoResizeResizeHandler) {
+        this._autoResizeResizeHandler = () => this._updateAutoHeight();
+      }
+      if (this.container.classList.contains("overtype-auto-resize")) {
+        this._updateAutoHeight();
+        return;
+      }
       this.container.classList.add("overtype-auto-resize");
       this.previousHeight = null;
       this._updateAutoHeight();
-      this.textarea.addEventListener("input", () => this._updateAutoHeight());
-      window.addEventListener("resize", () => this._updateAutoHeight());
+      this.textarea.addEventListener("input", this._autoResizeInputHandler);
+      window.addEventListener("resize", this._autoResizeResizeHandler);
+    }
+    /**
+     * Disable auto-resize behavior and restore default sizing
+     * @private
+     */
+    _destroyAutoResize() {
+      this.container?.classList.remove("overtype-auto-resize");
+      if (this.textarea && this._autoResizeInputHandler) {
+        this.textarea.removeEventListener("input", this._autoResizeInputHandler);
+      }
+      if (this._autoResizeResizeHandler) {
+        window.removeEventListener("resize", this._autoResizeResizeHandler);
+      }
+      this.wrapper?.style.removeProperty("height");
+      this.preview?.style.removeProperty("height");
+      this.preview?.style.removeProperty("overflow-y");
+      this.textarea?.style.removeProperty("height");
+      this.textarea?.style.removeProperty("overflow-y");
+      this.previousHeight = null;
     }
     /**
      * Update height based on scrollHeight
@@ -5681,18 +5975,34 @@ ${blockSuffix}` : suffix;
      * @param {boolean} show - Whether to show stats
      */
     showStats(show) {
-      this.options.showStats = show;
-      if (show && !this.statsBar) {
+      const normalized = !!show;
+      const didChange = this.options.showStats !== normalized;
+      this.options.showStats = normalized;
+      if (normalized && !this.statsBar) {
         this.statsBar = document.createElement("div");
         this.statsBar.className = "overtype-stats";
         this.container.appendChild(this.statsBar);
         this._updateStats();
-      } else if (show && this.statsBar) {
+      } else if (normalized && this.statsBar) {
         this._updateStats();
-      } else if (!show && this.statsBar) {
+      } else if (!normalized && this.statsBar) {
         this.statsBar.remove();
         this.statsBar = null;
       }
+      if (this.toolbar?.updateButtonStates) {
+        this.toolbar.updateButtonStates();
+      }
+      if (didChange && typeof this.options.onShowStatsChange === "function") {
+        this.options.onShowStatsChange(normalized, this);
+      }
+      return this;
+    }
+    /**
+     * Toggle stats bar visibility
+     * @returns {this} Returns this for chaining
+     */
+    toggleStats() {
+      return this.showStats(!this.options.showStats);
     }
     /**
      * Show normal edit mode (overlay with markdown preview)
@@ -5700,6 +6010,7 @@ ${blockSuffix}` : suffix;
      */
     showNormalEditMode() {
       this.container.dataset.mode = "normal";
+      this._refreshNativeSpellcheck();
       this.updatePreview();
       this._updateAutoHeight();
       requestAnimationFrame(() => {
@@ -5714,6 +6025,7 @@ ${blockSuffix}` : suffix;
      */
     showPlainTextarea() {
       this.container.dataset.mode = "plain";
+      this._refreshNativeSpellcheck();
       this._updateAutoHeight();
       if (this.toolbar) {
         const toggleBtn = this.container.querySelector('[data-action="toggle-plain"]');
@@ -5730,6 +6042,7 @@ ${blockSuffix}` : suffix;
      */
     showPreviewMode() {
       this.container.dataset.mode = "preview";
+      this._refreshNativeSpellcheck();
       this.updatePreview();
       this._updateAutoHeight();
       return this;
@@ -5740,6 +6053,8 @@ ${blockSuffix}` : suffix;
     destroy() {
       _OverType._autoInstances.delete(this);
       _OverType._stopAutoListener();
+      this._stopScrollSyncLoop();
+      this._destroyAutoResize();
       if (this.fileUploadInitialized) {
         this._destroyFileUpload();
       }
@@ -5973,7 +6288,7 @@ ${blockSuffix}` : suffix;
       document.addEventListener("input", (e) => {
         if (e.target && e.target.classList && e.target.classList.contains("overtype-input")) {
           const wrapper = e.target.closest(".overtype-wrapper");
-          const instance = wrapper == null ? void 0 : wrapper._instance;
+          const instance = wrapper?._instance;
           if (instance)
             instance.handleInput(e);
         }
@@ -5981,7 +6296,7 @@ ${blockSuffix}` : suffix;
       document.addEventListener("keydown", (e) => {
         if (e.target && e.target.classList && e.target.classList.contains("overtype-input")) {
           const wrapper = e.target.closest(".overtype-wrapper");
-          const instance = wrapper == null ? void 0 : wrapper._instance;
+          const instance = wrapper?._instance;
           if (instance)
             instance.handleKeydown(e);
         }
@@ -5989,16 +6304,24 @@ ${blockSuffix}` : suffix;
       document.addEventListener("scroll", (e) => {
         if (e.target && e.target.classList && e.target.classList.contains("overtype-input")) {
           const wrapper = e.target.closest(".overtype-wrapper");
-          const instance = wrapper == null ? void 0 : wrapper._instance;
+          const instance = wrapper?._instance;
           if (instance)
             instance.handleScroll(e);
         }
       }, true);
+      document.addEventListener("wheel", (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains("overtype-input")) {
+          const wrapper = e.target.closest(".overtype-wrapper");
+          const instance = wrapper?._instance;
+          if (instance)
+            instance.handleWheel(e);
+        }
+      }, { capture: true, passive: false });
       document.addEventListener("selectionchange", (e) => {
         const activeElement = document.activeElement;
         if (activeElement && activeElement.classList.contains("overtype-input")) {
           const wrapper = activeElement.closest(".overtype-wrapper");
-          const instance = wrapper == null ? void 0 : wrapper._instance;
+          const instance = wrapper?._instance;
           if (instance) {
             if (instance.options.showStats && instance.statsBar) {
               instance._updateStats();
@@ -6013,17 +6336,6 @@ ${blockSuffix}` : suffix;
       _OverType.globalListenersInitialized = true;
     }
   };
-  // Static properties
-  __publicField(_OverType, "instances", /* @__PURE__ */ new WeakMap());
-  __publicField(_OverType, "stylesInjected", false);
-  __publicField(_OverType, "globalListenersInitialized", false);
-  __publicField(_OverType, "instanceCount", 0);
-  __publicField(_OverType, "_autoMediaQuery", null);
-  __publicField(_OverType, "_autoMediaListener", null);
-  __publicField(_OverType, "_autoInstances", /* @__PURE__ */ new Set());
-  __publicField(_OverType, "_globalAutoTheme", false);
-  __publicField(_OverType, "_globalAutoCustomColors", null);
-  var OverType = _OverType;
   OverType.MarkdownParser = MarkdownParser;
   OverType.ShortcutsManager = ShortcutsManager;
   OverType.themes = { solar, cave: getTheme("cave") };
@@ -6031,9 +6343,13 @@ ${blockSuffix}` : suffix;
   OverType.currentTheme = solar;
   var overtype_default = OverType;
 
-  // src/overtype-webcomponent.js
-  var CONTAINER_CLASS = "overtype-webcomponent-container";
+  // src/v-markdown-input-webcomponent.js
+  var CONTAINER_CLASS = "v-markdown-input-container";
   var DEFAULT_PLACEHOLDER = "Start typing...";
+  var SHIKI_VERSION = "4.0.2";
+  var SHIKI_PRIMARY_CDN_URL = `https://esm.sh/shiki@${SHIKI_VERSION}`;
+  var SHIKI_FALLBACK_CDN_URL = `https://esm.run/shiki@${SHIKI_VERSION}`;
+  var MAX_HIGHLIGHT_CACHE_ENTRIES = 200;
   var OBSERVED_ATTRIBUTES = [
     "value",
     "theme",
@@ -6050,9 +6366,12 @@ ${blockSuffix}` : suffix;
     "show-stats",
     "smart-lists",
     "readonly",
-    "spellcheck"
+    "spellcheck",
+    "syntax-highlighting",
+    "show-active-line-raw",
+    "mode"
   ];
-  var OverTypeEditor = class extends HTMLElement {
+  var VMarkdownInputElement = class extends HTMLElement {
     constructor() {
       super();
       this.attachShadow({ mode: "open" });
@@ -6063,46 +6382,34 @@ ${blockSuffix}` : suffix;
       this._baseStyleElement = null;
       this._selectionChangeHandler = null;
       this._isConnected = false;
+      this._advancedOptions = {};
+      this._shikiHighlightCache = /* @__PURE__ */ new Map();
+      this._pendingShikiHighlights = /* @__PURE__ */ new Set();
+      this._shikiLoaderPromise = null;
+      this._shikiCodeToHtml = null;
+      this._shikiSourceUrl = null;
+      this._shikiLoadError = null;
+      this._shikiLoadFailed = false;
+      this._syntaxHighlightingStatus = null;
       this._handleChange = this._handleChange.bind(this);
       this._handleKeydown = this._handleKeydown.bind(this);
       this._handleRender = this._handleRender.bind(this);
+      this._handleAutoResizeChange = this._handleAutoResizeChange.bind(this);
+      this._handleShowStatsChange = this._handleShowStatsChange.bind(this);
+      this._handleSpellcheckChange = this._handleSpellcheckChange.bind(this);
+      this._internalCodeHighlighter = this._internalCodeHighlighter.bind(this);
     }
-    /**
-     * Decode common escape sequences from attribute string values
-     * @private
-     * @param {string|null|undefined} str
-     * @returns {string}
-     */
-    _decodeValue(str) {
-      if (typeof str !== "string")
-        return "";
-      return str.replace(/\\r/g, "\r").replace(/\\n/g, "\n").replace(/\\t/g, "	");
-    }
-    // Note: _encodeValue removed as it's currently unused
-    // Can be re-added if needed for future attribute encoding
-    /**
-     * Define observed attributes for reactive updates
-     */
     static get observedAttributes() {
       return OBSERVED_ATTRIBUTES;
     }
-    /**
-     * Component connected to DOM - initialize editor
-     */
     connectedCallback() {
       this._isConnected = true;
       this._initializeEditor();
     }
-    /**
-     * Component disconnected from DOM - cleanup
-     */
     disconnectedCallback() {
       this._isConnected = false;
       this._cleanup();
     }
-    /**
-     * Attribute changed callback - update editor options
-     */
     attributeChangedCallback(name, oldValue, newValue) {
       if (oldValue === newValue)
         return;
@@ -6114,10 +6421,213 @@ ${blockSuffix}` : suffix;
       }
       this._updateOption(name, newValue);
     }
-    /**
-     * Initialize the OverType editor inside shadow DOM
-     * @private
-     */
+    _decodeValue(str) {
+      if (typeof str !== "string")
+        return "";
+      return str.replace(/\\r/g, "\r").replace(/\\n/g, "\n").replace(/\\t/g, "	");
+    }
+    _isSpellcheckEnabled() {
+      return this.hasAttribute("spellcheck") && this.getAttribute("spellcheck") !== "false";
+    }
+    _isSyntaxHighlightingEnabled() {
+      return !this.hasAttribute("syntax-highlighting") || this.getAttribute("syntax-highlighting") !== "false";
+    }
+    _hasCustomCodeHighlighter() {
+      return typeof this._advancedOptions.codeHighlighter === "function";
+    }
+    _usesInternalCodeHighlighter() {
+      return this._isSyntaxHighlightingEnabled() && !this._hasCustomCodeHighlighter();
+    }
+    _resolveCodeHighlighter(customCodeHighlighter = this._advancedOptions.codeHighlighter) {
+      if (typeof customCodeHighlighter === "function") {
+        return customCodeHighlighter;
+      }
+      return this._isSyntaxHighlightingEnabled() ? this._internalCodeHighlighter : null;
+    }
+    _currentShikiTheme() {
+      const theme = this.getAttribute("theme") || "solar";
+      if (theme === "cave")
+        return "github-dark";
+      if (theme === "auto" && window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
+        return "github-dark";
+      }
+      return "github-light";
+    }
+    _normalizeCodeLanguage(language) {
+      const aliases = {
+        js: "javascript",
+        ts: "typescript",
+        py: "python",
+        rs: "rust",
+        sh: "bash",
+        yml: "yaml"
+      };
+      return aliases[language] || language || "text";
+    }
+    _extractHighlightedCode(html, fallback) {
+      const match = html.match(/<code[^>]*>([\s\S]*?)<\/code>/);
+      return match ? match[1] : fallback;
+    }
+    _rememberHighlightCache(cacheKey, value) {
+      if (this._shikiHighlightCache.has(cacheKey)) {
+        this._shikiHighlightCache.delete(cacheKey);
+      } else if (this._shikiHighlightCache.size >= MAX_HIGHLIGHT_CACHE_ENTRIES) {
+        const oldestKey = this._shikiHighlightCache.keys().next().value;
+        if (oldestKey !== void 0) {
+          this._shikiHighlightCache.delete(oldestKey);
+        }
+      }
+      this._shikiHighlightCache.set(cacheKey, value);
+    }
+    _clearInternalHighlightCache() {
+      this._shikiHighlightCache.clear();
+      this._pendingShikiHighlights.clear();
+    }
+    _resetSyntaxHighlightingErrorState() {
+      this._shikiLoadError = null;
+      this._shikiLoadFailed = false;
+      if (!this._shikiCodeToHtml) {
+        this._shikiLoaderPromise = null;
+        this._shikiSourceUrl = null;
+      }
+    }
+    _buildSyntaxHighlightingStatus(state, overrides = {}) {
+      const usingCustomHighlighter = this._hasCustomCodeHighlighter();
+      const internalEnabled = this._isSyntaxHighlightingEnabled();
+      return {
+        enabled: usingCustomHighlighter || internalEnabled,
+        internalEnabled,
+        state,
+        source: overrides.source || (usingCustomHighlighter ? "custom" : internalEnabled ? "shiki-cdn" : "none"),
+        version: SHIKI_VERSION,
+        url: Object.prototype.hasOwnProperty.call(overrides, "url") ? overrides.url : this._shikiSourceUrl || null,
+        error: overrides.error ? { message: overrides.error.message || String(overrides.error) } : null
+      };
+    }
+    _setSyntaxHighlightingStatus(state, overrides = {}) {
+      const status = this._buildSyntaxHighlightingStatus(state, overrides);
+      this._syntaxHighlightingStatus = status;
+      this._dispatchEvent("syntax-highlighting-status", status);
+      return status;
+    }
+    _syncSyntaxHighlightingStatus() {
+      if (this._hasCustomCodeHighlighter()) {
+        return this._setSyntaxHighlightingStatus("custom", { source: "custom", url: null });
+      }
+      if (!this._isSyntaxHighlightingEnabled()) {
+        return this._setSyntaxHighlightingStatus("disabled", { source: "none", url: null });
+      }
+      if (this._shikiCodeToHtml) {
+        return this._setSyntaxHighlightingStatus("active");
+      }
+      if (this._shikiLoaderPromise) {
+        return this._setSyntaxHighlightingStatus("loading");
+      }
+      if (this._shikiLoadFailed && this._shikiLoadError) {
+        return this._setSyntaxHighlightingStatus("error", { error: this._shikiLoadError });
+      }
+      return this._setSyntaxHighlightingStatus("idle");
+    }
+    async _ensureShikiCodeToHtml() {
+      if (this._shikiCodeToHtml) {
+        if (this._usesInternalCodeHighlighter()) {
+          this._setSyntaxHighlightingStatus("active");
+        }
+        return this._shikiCodeToHtml;
+      }
+      if (this._shikiLoadFailed && this._shikiLoadError) {
+        throw this._shikiLoadError;
+      }
+      if (!this._shikiLoaderPromise) {
+        this._setSyntaxHighlightingStatus("loading");
+        this._shikiLoaderPromise = (async () => {
+          try {
+            const primaryModule = await import("https://esm.sh/shiki@4.0.2");
+            this._shikiCodeToHtml = primaryModule.codeToHtml;
+            this._shikiSourceUrl = SHIKI_PRIMARY_CDN_URL;
+            this._shikiLoadError = null;
+            this._shikiLoadFailed = false;
+            if (this._usesInternalCodeHighlighter()) {
+              this._setSyntaxHighlightingStatus("active");
+            }
+            return this._shikiCodeToHtml;
+          } catch (primaryError) {
+            try {
+              const fallbackModule = await import("https://esm.run/shiki@4.0.2");
+              this._shikiCodeToHtml = fallbackModule.codeToHtml;
+              this._shikiSourceUrl = SHIKI_FALLBACK_CDN_URL;
+              this._shikiLoadError = null;
+              this._shikiLoadFailed = false;
+              if (this._usesInternalCodeHighlighter()) {
+                this._setSyntaxHighlightingStatus("active");
+              }
+              return this._shikiCodeToHtml;
+            } catch (fallbackError) {
+              this._shikiLoaderPromise = null;
+              this._shikiLoadFailed = true;
+              this._shikiLoadError = fallbackError;
+              if (this._usesInternalCodeHighlighter()) {
+                this._setSyntaxHighlightingStatus("error", { error: fallbackError });
+              }
+              throw fallbackError;
+            }
+          }
+        })();
+      }
+      return this._shikiLoaderPromise;
+    }
+    _primeInternalSyntaxHighlighting() {
+      if (!this._isConnected || !this._usesInternalCodeHighlighter()) {
+        this._syncSyntaxHighlightingStatus();
+        return;
+      }
+      this._ensureShikiCodeToHtml().catch(() => {
+      });
+    }
+    _internalCodeHighlighter(code, language) {
+      if (!this._usesInternalCodeHighlighter()) {
+        return code;
+      }
+      const normalizedLanguage = this._normalizeCodeLanguage(language);
+      const theme = this._currentShikiTheme();
+      const cacheKey = `${theme}:${normalizedLanguage}:${code}`;
+      if (this._shikiHighlightCache.has(cacheKey)) {
+        return this._shikiHighlightCache.get(cacheKey);
+      }
+      if (this._pendingShikiHighlights.has(cacheKey)) {
+        return code;
+      }
+      this._pendingShikiHighlights.add(cacheKey);
+      this._ensureShikiCodeToHtml().then((codeToHtml) => codeToHtml(code, {
+        lang: normalizedLanguage,
+        theme
+      })).then((html) => {
+        const highlightedCode = this._extractHighlightedCode(html, code);
+        this._rememberHighlightCache(cacheKey, highlightedCode);
+        if (!this._isConnected)
+          return;
+        if (!this._editor?.updatePreview)
+          return;
+        if (this._editor.options.codeHighlighter !== this._internalCodeHighlighter)
+          return;
+        this._editor.updatePreview();
+      }).catch(() => {
+      }).finally(() => {
+        this._pendingShikiHighlights.delete(cacheKey);
+      });
+      return code;
+    }
+    _applyResolvedCodeHighlighter() {
+      const resolvedHighlighter = this._resolveCodeHighlighter();
+      if (this._editor?.setCodeHighlighter) {
+        this._editor.setCodeHighlighter(resolvedHighlighter);
+      } else if (this._editor) {
+        this._editor.options.codeHighlighter = resolvedHighlighter;
+        this._editor.updatePreview();
+      }
+      this._syncSyntaxHighlightingStatus();
+      return resolvedHighlighter;
+    }
     _initializeEditor() {
       if (this._initialized || !this._isConnected)
         return;
@@ -6135,62 +6645,83 @@ ${blockSuffix}` : suffix;
           container.style.maxHeight = maxHeight;
         this._injectStyles();
         this.shadowRoot.appendChild(container);
-        const options = this._getOptionsFromAttributes();
-        const editorInstances = new overtype_default(container, options);
-        this._editor = editorInstances[0];
+        const options = this._getInitializationOptions();
+        const instances = new overtype_default(container, options);
+        this._editor = instances[0];
         this._initialized = true;
-        if (this._editor && this._editor.textarea) {
+        this._syncSizeOptionsToEditor();
+        if (this._editor?.textarea) {
           this._editor.textarea.addEventListener("scroll", () => {
-            if (this._editor && this._editor.preview && this._editor.textarea) {
+            if (this._editor?.preview && this._editor?.textarea) {
               this._editor.preview.scrollTop = this._editor.textarea.scrollTop;
               this._editor.preview.scrollLeft = this._editor.textarea.scrollLeft;
             }
           });
-          this._editor.textarea.addEventListener("input", (e) => {
-            if (this._editor && this._editor.handleInput) {
-              this._editor.handleInput(e);
+          this._editor.textarea.addEventListener("input", (event) => {
+            if (this._editor?.handleInput) {
+              this._editor.handleInput(event);
             }
           });
-          this._editor.textarea.addEventListener("keydown", (e) => {
-            if (this._editor && this._editor.handleKeydown) {
-              this._editor.handleKeydown(e);
+          this._editor.textarea.addEventListener("keydown", (event) => {
+            if (this._editor?.handleKeydown) {
+              this._editor.handleKeydown(event);
             }
           });
           this._selectionChangeHandler = () => {
-            if (document.activeElement === this) {
-              const shadowActiveElement = this.shadowRoot.activeElement;
-              if (shadowActiveElement && shadowActiveElement === this._editor.textarea) {
-                if (this._editor.options.showStats && this._editor.statsBar) {
-                  this._editor._updateStats();
-                }
-                if (this._editor.linkTooltip && this._editor.linkTooltip.checkCursorPosition) {
-                  this._editor.linkTooltip.checkCursorPosition();
-                }
+            if (document.activeElement !== this)
+              return;
+            const shadowActiveElement = this.shadowRoot.activeElement;
+            if (shadowActiveElement && shadowActiveElement === this._editor.textarea) {
+              if (this._editor.options.showStats && this._editor.statsBar) {
+                this._editor._updateStats();
+              }
+              if (this._editor.linkTooltip?.checkCursorPosition) {
+                this._editor.linkTooltip.checkCursorPosition();
               }
             }
           };
           document.addEventListener("selectionchange", this._selectionChangeHandler);
         }
         this._applyPendingOptions();
-        this._dispatchEvent("ready", { editor: this._editor });
+        this._applyMode(this.getAttribute("mode") || "normal");
+        requestAnimationFrame(() => this._syncSizeOptionsToEditor());
+        this._syncSyntaxHighlightingStatus();
+        this._primeInternalSyntaxHighlighting();
+        this._dispatchEvent("ready", {
+          editor: this._editor,
+          syntaxHighlighting: this.getSyntaxHighlightingStatus()
+        });
       } catch (error) {
         const message = error && error.message ? error.message : String(error);
-        console.warn("OverType Web Component initialization failed:", message);
+        console.warn("v-markdown-input initialization failed:", message);
         this._dispatchEvent("error", { error: { message } });
       }
     }
-    /**
-     * Inject styles into shadow DOM for complete isolation
-     * @private
-     */
+    _getInitializationOptions() {
+      const baseOptions = this._getOptionsFromAttributes();
+      const {
+        fileUpload: advancedFileUploadOptions,
+        codeHighlighter: customCodeHighlighter,
+        ...advancedOptions
+      } = this._advancedOptions;
+      const advancedFileUpload = advancedFileUploadOptions ? {
+        ...baseOptions.fileUpload || {},
+        ...advancedFileUploadOptions
+      } : baseOptions.fileUpload;
+      return {
+        ...baseOptions,
+        ...advancedOptions,
+        ...advancedFileUpload ? { fileUpload: advancedFileUpload } : {},
+        codeHighlighter: this._resolveCodeHighlighter(customCodeHighlighter)
+      };
+    }
     _injectStyles() {
       const style = document.createElement("style");
       const themeAttr = this.getAttribute("theme") || "solar";
       const theme = getTheme(themeAttr);
-      const options = this._getOptionsFromAttributes();
+      const options = this._getInitializationOptions();
       const styles = generateStyles({ ...options, theme });
-      const webComponentStyles = `
-      /* Web Component Host Styles */
+      const wrapperStyles = `
       :host {
         display: block;
         position: relative;
@@ -6198,43 +6729,38 @@ ${blockSuffix}` : suffix;
         height: 100%;
         contain: layout style;
       }
-      
-      .overtype-webcomponent-container {
+
+      .${CONTAINER_CLASS} {
         width: 100%;
         height: 100%;
         position: relative;
       }
-      
-      /* Override container grid layout for web component */
+
       .overtype-container {
         height: 100% !important;
       }
     `;
       this._styleVersion += 1;
-      const versionBanner = `
-/* overtype-webcomponent styles v${this._styleVersion} */
-`;
-      style.textContent = versionBanner + styles + webComponentStyles;
+      style.textContent = `
+/* v-markdown-input styles v${this._styleVersion} */
+${styles}${wrapperStyles}`;
       this._baseStyleElement = style;
       this.shadowRoot.appendChild(style);
     }
-    /**
-     * Extract options from HTML attributes
-     * @private
-     * @returns {Object} OverType options object
-     */
     _getOptionsFromAttributes() {
       const options = {
-        // Allow authoring multi-line content via escaped sequences in attributes
-        // and fall back to light DOM text content if attribute is absent
         value: this.getAttribute("value") !== null ? this._decodeValue(this.getAttribute("value")) : (this.textContent || "").trim(),
         placeholder: this.getAttribute("placeholder") || DEFAULT_PLACEHOLDER,
         toolbar: this.hasAttribute("toolbar"),
         autofocus: this.hasAttribute("autofocus"),
         autoResize: this.hasAttribute("auto-resize"),
         showStats: this.hasAttribute("show-stats"),
+        showActiveLineRaw: this.hasAttribute("show-active-line-raw"),
         smartLists: !this.hasAttribute("smart-lists") || this.getAttribute("smart-lists") !== "false",
-        spellcheck: this.hasAttribute("spellcheck") && this.getAttribute("spellcheck") !== "false",
+        spellcheck: this._isSpellcheckEnabled(),
+        onAutoResizeChange: this._handleAutoResizeChange,
+        onShowStatsChange: this._handleShowStatsChange,
+        onSpellcheckChange: this._handleSpellcheckChange,
         onChange: this._handleChange,
         onKeydown: this._handleKeydown,
         onRender: this._handleRender
@@ -6256,49 +6782,38 @@ ${blockSuffix}` : suffix;
         options.maxHeight = maxHeight;
       return options;
     }
-    /**
-     * Apply pending option changes after initialization
-     * @private
-     */
     _applyPendingOptions() {
-      for (const [attr, value] of Object.entries(this._pendingOptions)) {
-        this._updateOption(attr, value);
+      for (const [attribute, value] of Object.entries(this._pendingOptions)) {
+        this._updateOption(attribute, value);
       }
       this._pendingOptions = {};
     }
-    /**
-     * Update a single editor option
-     * @private
-     * @param {string} attribute - Attribute name
-     * @param {string} value - New value
-     */
     _updateOption(attribute, value) {
       if (!this._editor)
         return;
       switch (attribute) {
-        case "value":
-          {
-            const decoded = this._decodeValue(value);
-            if (this._editor.getValue() !== decoded) {
-              this._editor.setValue(decoded || "");
-            }
+        case "value": {
+          const decoded = this._decodeValue(value);
+          if (this._editor.getValue() !== decoded) {
+            this._editor.setValue(decoded || "");
           }
           break;
+        }
         case "theme":
+          this._clearInternalHighlightCache();
           this._reinjectStyles();
-          if (this._editor && this._editor.setTheme) {
+          if (this._editor.setTheme) {
             this._editor.setTheme(value || "solar");
           }
+          this._syncSyntaxHighlightingStatus();
           break;
         case "placeholder":
-          if (this._editor) {
-            this._editor.options.placeholder = value || "";
-            if (this._editor.textarea) {
-              this._editor.textarea.placeholder = value || "";
-            }
-            if (this._editor.placeholderEl) {
-              this._editor.placeholderEl.textContent = value || "";
-            }
+          this._editor.options.placeholder = value || "";
+          if (this._editor.textarea) {
+            this._editor.textarea.placeholder = value || "";
+          }
+          if (this._editor.placeholderEl) {
+            this._editor.placeholderEl.textContent = value || "";
           }
           break;
         case "readonly":
@@ -6309,60 +6824,97 @@ ${blockSuffix}` : suffix;
         case "height":
         case "min-height":
         case "max-height":
+          this._syncSizeOptionsToEditor();
           this._updateContainerHeight();
           break;
+        case "mode":
+          this._applyMode(value || "normal");
+          break;
+        case "show-active-line-raw":
+          this._editor.options.showActiveLineRaw = this.hasAttribute("show-active-line-raw");
+          this._editor.updatePreview();
+          break;
+        case "syntax-highlighting":
+          this._clearInternalHighlightCache();
+          this._resetSyntaxHighlightingErrorState();
+          this._applyResolvedCodeHighlighter();
+          this._primeInternalSyntaxHighlighting();
+          break;
         case "toolbar":
-          if (!!this.hasAttribute("toolbar") === !!this._editor.options.toolbar)
-            return;
-          this._reinitializeEditor();
+          if (!!this.hasAttribute("toolbar") !== !!this._editor.options.toolbar) {
+            this._reinitializeEditor();
+          }
           break;
         case "auto-resize":
-          if (!!this.hasAttribute("auto-resize") === !!this._editor.options.autoResize)
-            return;
-          this._reinitializeEditor();
+          if (typeof this._editor.setAutoResize === "function") {
+            this._editor.setAutoResize(this.hasAttribute("auto-resize"));
+          } else if (!!this.hasAttribute("auto-resize") !== !!this._editor.options.autoResize) {
+            this._reinitializeEditor();
+          }
+          this._updateContainerHeight();
           break;
         case "show-stats":
-          if (!!this.hasAttribute("show-stats") === !!this._editor.options.showStats)
-            return;
-          this._reinitializeEditor();
+          if (typeof this._editor.showStats === "function") {
+            this._editor.showStats(this.hasAttribute("show-stats"));
+          } else if (!!this.hasAttribute("show-stats") !== !!this._editor.options.showStats) {
+            this._reinitializeEditor();
+          }
+          this._syncSizeOptionsToEditor();
           break;
-        case "font-size": {
+        case "font-size":
           if (this._updateFontSize(value)) {
             this._reinjectStyles();
           }
           break;
-        }
-        case "line-height": {
+        case "line-height":
           if (this._updateLineHeight(value)) {
             this._reinjectStyles();
           }
           break;
-        }
         case "padding":
           this._reinjectStyles();
           break;
         case "smart-lists": {
-          const newSmartLists = !this.hasAttribute("smart-lists") || this.getAttribute("smart-lists") !== "false";
-          if (!!this._editor.options.smartLists === !!newSmartLists)
-            return;
-          this._reinitializeEditor();
+          const smartLists = !this.hasAttribute("smart-lists") || this.getAttribute("smart-lists") !== "false";
+          if (!!this._editor.options.smartLists !== !!smartLists) {
+            this._reinitializeEditor();
+          }
           break;
         }
-        case "spellcheck":
-          if (this._editor) {
-            const enabled = this.hasAttribute("spellcheck") && this.getAttribute("spellcheck") !== "false";
+        case "spellcheck": {
+          const enabled = this._isSpellcheckEnabled();
+          if (typeof this._editor.setSpellcheck === "function") {
+            this._editor.setSpellcheck(enabled);
+          } else {
             this._editor.options.spellcheck = enabled;
             if (this._editor.textarea) {
               this._editor.textarea.setAttribute("spellcheck", String(enabled));
             }
           }
           break;
+        }
       }
     }
-    /**
-     * Update container height from attributes
-     * @private
-     */
+    _applyMode(mode) {
+      if (!this._editor)
+        return;
+      if (mode === "preview") {
+        this._editor.showPreviewMode();
+      } else if (mode === "plain") {
+        this._editor.showPlainTextarea();
+      } else {
+        this._editor.showNormalEditMode();
+        mode = "normal";
+      }
+      this._updateModeAttribute(mode);
+    }
+    _updateModeAttribute(mode) {
+      if (this.getAttribute("mode") === mode)
+        return;
+      this._silentUpdate = true;
+      this.setAttribute("mode", mode);
+      this._silentUpdate = false;
+    }
     _updateContainerHeight() {
       const container = this.shadowRoot.querySelector(`.${CONTAINER_CLASS}`);
       if (!container)
@@ -6370,56 +6922,66 @@ ${blockSuffix}` : suffix;
       const height = this.getAttribute("height");
       const minHeight = this.getAttribute("min-height");
       const maxHeight = this.getAttribute("max-height");
-      container.style.height = height || "";
+      container.style.height = this.hasAttribute("auto-resize") ? "" : height || "";
       container.style.minHeight = minHeight || "";
       container.style.maxHeight = maxHeight || "";
     }
-    /**
-     * Update font size efficiently
-     * @private
-     * @param {string} value - New font size value
-     * @returns {boolean} True if direct update succeeded
-     */
+    _syncSizeOptionsToEditor() {
+      if (!this._editor)
+        return;
+      const minHeight = this.getAttribute("min-height");
+      const maxHeight = this.getAttribute("max-height");
+      this._editor.options.minHeight = minHeight || "100px";
+      this._editor.options.maxHeight = this._getEditorBodyMaxHeight(maxHeight);
+      if (this._editor.options.autoResize && typeof this._editor._updateAutoHeight === "function") {
+        this._editor._updateAutoHeight();
+      }
+    }
+    _getEditorBodyMaxHeight(maxHeight) {
+      if (!maxHeight)
+        return null;
+      const totalMaxHeight = parseFloat(maxHeight);
+      if (!Number.isFinite(totalMaxHeight))
+        return maxHeight;
+      const toolbarHeight = this._getElementOuterHeight(this._editor?.toolbar?.container);
+      const statsHeight = this._getElementOuterHeight(this._editor?.statsBar);
+      const editorMaxHeight = Math.max(60, Math.floor(totalMaxHeight - toolbarHeight - statsHeight));
+      return `${editorMaxHeight}px`;
+    }
+    _getElementOuterHeight(element) {
+      if (!element)
+        return 0;
+      const rectHeight = element.getBoundingClientRect?.().height || 0;
+      const ownHeight = rectHeight || element.offsetHeight || 0;
+      const styles = getComputedStyle(element);
+      const marginTop = parseFloat(styles.marginTop) || 0;
+      const marginBottom = parseFloat(styles.marginBottom) || 0;
+      return ownHeight + marginTop + marginBottom;
+    }
     _updateFontSize(value) {
-      if (this._editor && this._editor.wrapper) {
-        this._editor.options.fontSize = value || "";
-        this._editor.wrapper.style.setProperty("--instance-font-size", this._editor.options.fontSize);
-        this._editor.updatePreview();
-        return true;
-      }
-      return false;
+      if (!this._editor?.wrapper)
+        return false;
+      this._editor.options.fontSize = value || "";
+      this._editor.wrapper.style.setProperty("--instance-font-size", this._editor.options.fontSize);
+      this._editor.updatePreview();
+      return true;
     }
-    /**
-     * Update line height efficiently
-     * @private
-     * @param {string} value - New line height value
-     * @returns {boolean} True if direct update succeeded
-     */
     _updateLineHeight(value) {
-      if (this._editor && this._editor.wrapper) {
-        const numeric = parseFloat(value);
-        const lineHeight = Number.isFinite(numeric) ? numeric : this._editor.options.lineHeight;
-        this._editor.options.lineHeight = lineHeight;
-        this._editor.wrapper.style.setProperty("--instance-line-height", String(lineHeight));
-        this._editor.updatePreview();
-        return true;
-      }
-      return false;
+      if (!this._editor?.wrapper)
+        return false;
+      const numeric = parseFloat(value);
+      const lineHeight = Number.isFinite(numeric) ? numeric : this._editor.options.lineHeight;
+      this._editor.options.lineHeight = lineHeight;
+      this._editor.wrapper.style.setProperty("--instance-line-height", String(lineHeight));
+      this._editor.updatePreview();
+      return true;
     }
-    /**
-     * Re-inject styles (useful for theme changes)
-     * @private
-     */
     _reinjectStyles() {
-      if (this._baseStyleElement && this._baseStyleElement.parentNode) {
+      if (this._baseStyleElement?.parentNode) {
         this._baseStyleElement.remove();
       }
       this._injectStyles();
     }
-    /**
-     * Reinitialize the entire editor (for major option changes)
-     * @private
-     */
     _reinitializeEditor() {
       const currentValue = this._editor ? this._editor.getValue() : "";
       this._cleanup();
@@ -6430,38 +6992,21 @@ ${blockSuffix}` : suffix;
       }
       this._initializeEditor();
     }
-    /**
-     * Handle content changes from OverType
-     * @private
-     * @param {string} value - New editor value
-     */
     _handleChange(value) {
       this._updateValueAttribute(value);
-      if (!this._initialized || !this._editor) {
+      if (!this._initialized || !this._editor)
         return;
-      }
       this._dispatchEvent("change", {
         value,
         editor: this._editor
       });
     }
-    /**
-     * Handle keydown events from OverType
-     * @private
-     * @param {KeyboardEvent} event - Keyboard event
-     */
     _handleKeydown(event) {
       this._dispatchEvent("keydown", {
         event,
         editor: this._editor
       });
     }
-    /**
-     * Handle render events from OverType
-     * @private
-     * @param {HTMLElement} preview - The preview DOM element
-     * @param {string} mode - Current mode ('normal' or 'preview')
-     */
     _handleRender(preview, mode) {
       this._dispatchEvent("render", {
         preview,
@@ -6469,43 +7014,68 @@ ${blockSuffix}` : suffix;
         editor: this._editor
       });
     }
-    /**
-     * Update value attribute without triggering observer
-     * @private
-     * @param {string} value - New value
-     */
-    _updateValueAttribute(value) {
-      const currentAttrValue = this.getAttribute("value");
-      if (currentAttrValue !== value) {
-        this._silentUpdate = true;
-        this.setAttribute("value", value);
-        this._silentUpdate = false;
+    _handleSpellcheckChange(enabled) {
+      this._silentUpdate = true;
+      if (enabled) {
+        this.setAttribute("spellcheck", "");
+      } else {
+        this.removeAttribute("spellcheck");
       }
+      this._silentUpdate = false;
+      this._dispatchEvent("spellcheck-change", {
+        enabled,
+        editor: this._editor
+      });
     }
-    /**
-     * Dispatch custom events
-     * @private
-     * @param {string} eventName - Event name
-     * @param {Object} detail - Event detail
-     */
+    _handleAutoResizeChange(enabled) {
+      this._silentUpdate = true;
+      if (enabled) {
+        this.setAttribute("auto-resize", "");
+      } else {
+        this.removeAttribute("auto-resize");
+      }
+      this._silentUpdate = false;
+      this._updateContainerHeight();
+      this._syncSizeOptionsToEditor();
+      this._dispatchEvent("auto-resize-change", {
+        enabled,
+        editor: this._editor
+      });
+    }
+    _handleShowStatsChange(enabled) {
+      this._silentUpdate = true;
+      if (enabled) {
+        this.setAttribute("show-stats", "");
+      } else {
+        this.removeAttribute("show-stats");
+      }
+      this._silentUpdate = false;
+      this._syncSizeOptionsToEditor();
+      this._dispatchEvent("show-stats-change", {
+        enabled,
+        editor: this._editor
+      });
+    }
+    _updateValueAttribute(value) {
+      if (this.getAttribute("value") === value)
+        return;
+      this._silentUpdate = true;
+      this.setAttribute("value", value);
+      this._silentUpdate = false;
+    }
     _dispatchEvent(eventName, detail = {}) {
-      const event = new CustomEvent(eventName, {
+      this.dispatchEvent(new CustomEvent(eventName, {
         detail,
         bubbles: true,
         composed: true
-      });
-      this.dispatchEvent(event);
+      }));
     }
-    /**
-     * Cleanup editor and remove listeners
-     * @private
-     */
     _cleanup() {
       if (this._selectionChangeHandler) {
         document.removeEventListener("selectionchange", this._selectionChangeHandler);
         this._selectionChangeHandler = null;
       }
-      if (this._editor && typeof this._editor.destroy === "function") {
+      if (this._editor?.destroy) {
         this._editor.destroy();
       }
       this._editor = null;
@@ -6514,131 +7084,174 @@ ${blockSuffix}` : suffix;
         this.shadowRoot.innerHTML = "";
       }
     }
-    // ===== PUBLIC API METHODS =====
-    /**
-     * Refresh theme styles (useful when theme object is updated without changing theme name)
-     * @public
-     */
     refreshTheme() {
       if (this._initialized) {
         this._reinjectStyles();
       }
+      return this;
     }
-    /**
-     * Get current editor value
-     * @returns {string} Current markdown content
-     */
     getValue() {
       return this._editor ? this._editor.getValue() : this.getAttribute("value") || "";
     }
-    /**
-     * Set editor value
-     * @param {string} value - New markdown content
-     */
     setValue(value) {
       if (this._editor) {
         this._editor.setValue(value);
       } else {
         this.setAttribute("value", value);
       }
+      return this;
     }
-    /**
-     * Get rendered HTML
-     * @returns {string} Rendered HTML
-     */
     getHTML() {
       return this._editor ? this._editor.getRenderedHTML(false) : "";
     }
-    /**
-     * Insert text at cursor position
-     * @param {string} text - Text to insert
-     */
-    insertText(text) {
-      if (!this._editor || typeof text !== "string") {
-        return;
-      }
-      this._editor.insertText(text);
+    getCleanHTML() {
+      return this._editor ? this._editor.getCleanHTML() : "";
     }
-    /**
-     * Focus the editor
-     */
+    getPreviewHTML() {
+      return this._editor ? this._editor.getPreviewHTML() : "";
+    }
+    insertText(text) {
+      if (!this._editor || typeof text !== "string")
+        return this;
+      if (typeof this._editor.insertAtCursor === "function") {
+        this._editor.insertAtCursor(text);
+      } else if (typeof this._editor.insertText === "function") {
+        this._editor.insertText(text);
+      }
+      return this;
+    }
     focus() {
-      if (this._editor && this._editor.textarea) {
+      if (this._editor?.textarea) {
         this._editor.textarea.focus();
       }
+      return this;
     }
-    /**
-     * Blur the editor
-     */
     blur() {
-      if (this._editor && this._editor.textarea) {
+      if (this._editor?.textarea) {
         this._editor.textarea.blur();
       }
+      return this;
     }
-    /**
-     * Get editor statistics
-     * @returns {Object} Statistics object
-     */
     getStats() {
-      if (!this._editor || !this._editor.textarea)
+      if (!this._editor?.textarea)
         return null;
       const value = this._editor.textarea.value;
       const lines = value.split("\n");
       const chars = value.length;
-      const words = value.split(/\s+/).filter((w) => w.length > 0).length;
+      const words = value.split(/\s+/).filter(Boolean).length;
       const selectionStart = this._editor.textarea.selectionStart;
       const beforeCursor = value.substring(0, selectionStart);
       const linesBefore = beforeCursor.split("\n");
-      const currentLine = linesBefore.length;
-      const currentColumn = linesBefore[linesBefore.length - 1].length + 1;
       return {
         characters: chars,
         words,
         lines: lines.length,
-        line: currentLine,
-        column: currentColumn
+        line: linesBefore.length,
+        column: linesBefore[linesBefore.length - 1].length + 1
       };
     }
-    /**
-     * Check if editor is ready
-     * @returns {boolean} True if editor is initialized
-     */
     isReady() {
       return this._initialized && this._editor !== null;
     }
-    /**
-     * Get the internal OverType instance
-     * @returns {OverType} The OverType editor instance
-     */
+    getMode() {
+      if (this._editor?.container?.dataset?.mode) {
+        return this._editor.container.dataset.mode;
+      }
+      return this.getAttribute("mode") || "normal";
+    }
+    setMode(mode) {
+      this._applyMode(mode || "normal");
+      return this;
+    }
     getEditor() {
       return this._editor;
+    }
+    getSyntaxHighlightingStatus() {
+      if (this._syntaxHighlightingStatus) {
+        return { ...this._syntaxHighlightingStatus };
+      }
+      return { ...this._syncSyntaxHighlightingStatus() };
+    }
+    configure(options = {}) {
+      if (!options || typeof options !== "object")
+        return this;
+      const merged = { ...this._advancedOptions, ...options };
+      if (Object.prototype.hasOwnProperty.call(options, "codeHighlighter")) {
+        merged.codeHighlighter = typeof options.codeHighlighter === "function" ? options.codeHighlighter : null;
+      }
+      if (options.fileUpload || this._advancedOptions.fileUpload) {
+        merged.fileUpload = {
+          ...this._advancedOptions.fileUpload || {},
+          ...options.fileUpload || {}
+        };
+      }
+      this._advancedOptions = merged;
+      if (this._editor?.reinit) {
+        this._editor.reinit({
+          ...this._advancedOptions,
+          codeHighlighter: this._resolveCodeHighlighter()
+        });
+        this._syncSyntaxHighlightingStatus();
+        this._primeInternalSyntaxHighlighting();
+      }
+      if ("theme" in options) {
+        if (typeof options.theme === "string") {
+          this.setAttribute("theme", options.theme);
+        } else if (this._editor?.setTheme) {
+          this._editor.setTheme(options.theme);
+          this.refreshTheme();
+        }
+      }
+      return this;
+    }
+    setOptions(options = {}) {
+      return this.configure(options);
+    }
+    setCodeHighlighter(highlighter) {
+      this._advancedOptions = {
+        ...this._advancedOptions,
+        codeHighlighter: typeof highlighter === "function" ? highlighter : null
+      };
+      this._clearInternalHighlightCache();
+      this._resetSyntaxHighlightingErrorState();
+      this._applyResolvedCodeHighlighter();
+      this._primeInternalSyntaxHighlighting();
+      return this;
     }
     showToolbar() {
       if (this._editor) {
         this._editor.showToolbar();
       }
+      return this;
     }
     hideToolbar() {
       if (this._editor) {
         this._editor.hideToolbar();
       }
+      return this;
+    }
+    showNormalEditMode() {
+      this._applyMode("normal");
+      return this;
+    }
+    showPlainTextarea() {
+      this._applyMode("plain");
+      return this;
+    }
+    showPreviewMode() {
+      this._applyMode("preview");
+      return this;
     }
   };
-  if (!customElements.get("overtype-editor")) {
-    customElements.define("overtype-editor", OverTypeEditor);
+  if (!customElements.get("v-markdown-input")) {
+    customElements.define("v-markdown-input", VMarkdownInputElement);
   }
-  var overtype_webcomponent_default = OverTypeEditor;
-  return __toCommonJS(overtype_webcomponent_exports);
+  var v_markdown_input_webcomponent_default = VMarkdownInputElement;
+  return __toCommonJS(v_markdown_input_webcomponent_exports);
 })();
 /**
  * OverType - A lightweight markdown editor library with perfect WYSIWYG alignment
  * @version 1.0.0
  * @license MIT
  */
-/**
- * OverType Web Component
- * A custom element wrapper for the OverType markdown editor with Shadow DOM isolation
- * @version 1.0.0
- * @license MIT
- */
-//# sourceMappingURL=overtype-webcomponent.js.map
+//# sourceMappingURL=v-markdown-input-webcomponent.js.map

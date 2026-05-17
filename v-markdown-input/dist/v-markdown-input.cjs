@@ -1,16 +1,42 @@
 /**
- * OverType v2.3.5
- * A lightweight markdown editor library with perfect WYSIWYG alignment
- * @license MIT
- * @author David Miranda
- * https://github.com/panphora/overtype
+ * v-markdown-input v0.1.0
+ * Standalone web component scaffold derived from OverType by David Miranda
+ * Original project: https://github.com/panphora/overtype
+ * License preserved: MIT
  */
 var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
+
+// src/v-markdown-input.js
+var v_markdown_input_exports = {};
+__export(v_markdown_input_exports, {
+  OverType: () => overtype_default,
+  VMarkdownInput: () => VMarkdownInput,
+  default: () => v_markdown_input_default,
+  defaultToolbarButtons: () => defaultToolbarButtons,
+  toolbarButtons: () => toolbarButtons
+});
+module.exports = __toCommonJS(v_markdown_input_exports);
 
 // src/parser.js
 var MarkdownParser = class {
@@ -1895,15 +1921,15 @@ function generateStyles(options = {}) {
   `;
 }
 
-// node_modules/.pnpm/markdown-actions@1.1.2/node_modules/markdown-actions/dist/markdown-actions.esm.js
+// node_modules/markdown-actions/dist/markdown-actions.esm.js
 var __defProp2 = Object.defineProperty;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __hasOwnProp2 = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
 var __defNormalProp2 = (obj, key, value) => key in obj ? __defProp2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __spreadValues = (a, b) => {
   for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
+    if (__hasOwnProp2.call(b, prop))
       __defNormalProp2(a, prop, b[prop]);
   if (__getOwnPropSymbols)
     for (var prop of __getOwnPropSymbols(b)) {
@@ -2963,6 +2989,15 @@ var Toolbar = class {
           case "h3":
             isActive = activeFormats.includes("header-3");
             break;
+          case "spellcheck":
+            isActive = !!this.editor.options.spellcheck;
+            break;
+          case "autoResize":
+            isActive = !!this.editor.options.autoResize;
+            break;
+          case "stats":
+            isActive = !!this.editor.options.showStats;
+            break;
         }
         button.classList.toggle("active", isActive);
         button.setAttribute("aria-pressed", isActive.toString());
@@ -3001,7 +3036,7 @@ var Toolbar = class {
   }
 };
 
-// node_modules/.pnpm/@floating-ui+utils@0.2.11/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs
+// node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs
 var min = Math.min;
 var max = Math.max;
 var round = Math.round;
@@ -3129,7 +3164,7 @@ function rectToClientRect(rect) {
   };
 }
 
-// node_modules/.pnpm/@floating-ui+core@1.7.5/node_modules/@floating-ui/core/dist/floating-ui.core.mjs
+// node_modules/@floating-ui/core/dist/floating-ui.core.mjs
 function computeCoordsFromPlacement(_ref, placement, rtl) {
   let {
     reference,
@@ -3580,7 +3615,7 @@ var shift = function(options) {
   };
 };
 
-// node_modules/.pnpm/@floating-ui+utils@0.2.11/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs
+// node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs
 function hasWindow() {
   return typeof window !== "undefined";
 }
@@ -3736,7 +3771,7 @@ function getFrameElement(win) {
   return win.parent && Object.getPrototypeOf(win.parent) ? win.frameElement : null;
 }
 
-// node_modules/.pnpm/@floating-ui+dom@1.7.6/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs
+// node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs
 function getCssDimensions(element) {
   const css = getComputedStyle2(element);
   let width = parseFloat(css.width) || 0;
@@ -4438,6 +4473,25 @@ var uploadIcon = `<svg viewBox="0 0 18 18">
   <path stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.063 6.188L9 2.25l3.938 3.938"></path>
   <path stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2.25v10.125"></path>
 </svg>`;
+var spellcheckIcon = `<svg viewBox="0 0 18 18">
+  <path stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M3.5 12.5 7.2 4.5 10.9 12.5"></path>
+  <line stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" x1="4.8" x2="9.6" y1="10" y2="10"></line>
+  <polyline stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" points="10.8 11.2 12.8 13.1 15.8 8.9"></polyline>
+</svg>`;
+var autoResizeIcon = `<svg viewBox="0 0 18 18">
+  <polyline stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" points="9 2.5 6.2 5.3 11.8 5.3"></polyline>
+  <line stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" x1="9" x2="9" y1="3.2" y2="8"></line>
+  <polyline stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" points="9 15.5 6.2 12.7 11.8 12.7"></polyline>
+  <line stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" x1="9" x2="9" y1="9.8" y2="14.6"></line>
+  <rect stroke="currentColor" fill="none" stroke-width="1.4" x="3.5" y="6.3" width="11" height="5.4" rx="1.2"></rect>
+</svg>`;
+var statsIcon = `<svg viewBox="0 0 18 18">
+  <line stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" x1="3" x2="3" y1="14.5" y2="4"></line>
+  <line stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" x1="3" x2="15" y1="14.5" y2="14.5"></line>
+  <rect fill="currentColor" x="5" y="9.5" width="2.2" height="4"></rect>
+  <rect fill="currentColor" x="8.4" y="6.8" width="2.2" height="6.7"></rect>
+  <rect fill="currentColor" x="11.8" y="4.5" width="2.2" height="9"></rect>
+</svg>`;
 var eyeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="none"></path>
   <circle cx="12" cy="12" r="3" fill="none"></circle>
@@ -4588,6 +4642,39 @@ var toolbarButtons = {
       input.click();
     }
   },
+  spellcheck: {
+    name: "spellcheck",
+    actionId: "toggleSpellcheck",
+    icon: spellcheckIcon,
+    title: "Toggle Spellcheck",
+    action: ({ editor }) => {
+      if (typeof editor.toggleSpellcheck === "function") {
+        editor.toggleSpellcheck();
+      }
+    }
+  },
+  autoResize: {
+    name: "autoResize",
+    actionId: "toggleAutoResize",
+    icon: autoResizeIcon,
+    title: "Toggle Auto Resize",
+    action: ({ editor }) => {
+      if (typeof editor.toggleAutoResize === "function") {
+        editor.toggleAutoResize();
+      }
+    }
+  },
+  stats: {
+    name: "stats",
+    actionId: "toggleStats",
+    icon: statsIcon,
+    title: "Toggle Stats",
+    action: ({ editor }) => {
+      if (typeof editor.toggleStats === "function") {
+        editor.toggleStats();
+      }
+    }
+  },
   viewMode: {
     name: "viewMode",
     icon: eyeIcon,
@@ -4613,6 +4700,9 @@ var defaultToolbarButtons = [
   toolbarButtons.separator,
   toolbarButtons.quote,
   toolbarButtons.separator,
+  toolbarButtons.spellcheck,
+  toolbarButtons.autoResize,
+  toolbarButtons.stats,
   toolbarButtons.viewMode
 ];
 
@@ -4655,6 +4745,25 @@ function toolbarButtonsChanged(prevButtons, nextButtons) {
     }
   }
   return false;
+}
+var SCROLL_SYNC_SETTLE_MS = 180;
+function compactToolbarButtons(buttons) {
+  var _a, _b;
+  const compact = [];
+  for (const button of buttons || []) {
+    if (!button)
+      continue;
+    if (button.name === "separator") {
+      if (compact.length === 0 || ((_a = compact[compact.length - 1]) == null ? void 0 : _a.name) === "separator") {
+        continue;
+      }
+    }
+    compact.push(button);
+  }
+  if (((_b = compact[compact.length - 1]) == null ? void 0 : _b.name) === "separator") {
+    compact.pop();
+  }
+  return compact;
 }
 var _OverType = class _OverType {
   /**
@@ -4703,6 +4812,8 @@ var _OverType = class _OverType {
     this.options = this._mergeOptions(options);
     this.instanceId = ++_OverType.instanceCount;
     this.initialized = false;
+    this._scrollSyncFrameId = null;
+    this._scrollSyncUntil = 0;
     _OverType.injectStyles();
     _OverType.initGlobalListeners();
     const container = element.querySelector(".overtype-container");
@@ -4764,6 +4875,8 @@ var _OverType = class _OverType {
       onChange: null,
       onKeydown: null,
       onRender: null,
+      onAutoResizeChange: null,
+      onShowStatsChange: null,
       // Features
       showActiveLineRaw: false,
       showStats: false,
@@ -4940,10 +5053,121 @@ var _OverType = class _OverType {
     this.textarea.setAttribute("autocomplete", "off");
     this.textarea.setAttribute("autocorrect", "off");
     this.textarea.setAttribute("autocapitalize", "off");
-    this.textarea.setAttribute("spellcheck", String(this.options.spellcheck));
+    this._applyNativeSpellcheck();
     this.textarea.setAttribute("data-gramm", "false");
     this.textarea.setAttribute("data-gramm_editor", "false");
     this.textarea.setAttribute("data-enable-grammarly", "false");
+  }
+  /**
+   * Whether native browser spellcheck should be rendered on the textarea
+   * @returns {boolean}
+   * @private
+   */
+  _shouldRenderNativeSpellcheck() {
+    return !!this.options.spellcheck;
+  }
+  /**
+   * Apply the effective native spellcheck state to the textarea
+   * @private
+   */
+  _applyNativeSpellcheck() {
+    if (!this.textarea)
+      return;
+    this.textarea.setAttribute("spellcheck", String(this._shouldRenderNativeSpellcheck()));
+  }
+  /**
+   * Refresh native spellcheck state on the current textarea.
+   * @private
+   */
+  _refreshNativeSpellcheck() {
+    if (!this.textarea)
+      return;
+    this._applyNativeSpellcheck();
+  }
+  /**
+   * Sync the preview viewport to the textarea viewport
+   * @private
+   */
+  _syncPreviewScroll() {
+    if (!this.textarea || !this.preview)
+      return;
+    this.preview.scrollTop = this.textarea.scrollTop;
+    this.preview.scrollLeft = this.textarea.scrollLeft;
+  }
+  /**
+   * Stop the active scroll-sync animation loop
+   * @private
+   */
+  _stopScrollSyncLoop() {
+    if (this._scrollSyncFrameId) {
+      cancelAnimationFrame(this._scrollSyncFrameId);
+      this._scrollSyncFrameId = null;
+    }
+    this._scrollSyncUntil = 0;
+  }
+  /**
+   * Keep preview scroll tightly locked to textarea scroll while momentum scrolling settles
+   * @private
+   */
+  _startScrollSyncLoop() {
+    const now = typeof performance !== "undefined" && typeof performance.now === "function" ? performance.now() : Date.now();
+    this._scrollSyncUntil = now + SCROLL_SYNC_SETTLE_MS;
+    if (this._scrollSyncFrameId)
+      return;
+    const tick = () => {
+      this._syncPreviewScroll();
+      const currentTime = typeof performance !== "undefined" && typeof performance.now === "function" ? performance.now() : Date.now();
+      if (currentTime < this._scrollSyncUntil) {
+        this._scrollSyncFrameId = requestAnimationFrame(tick);
+        return;
+      }
+      this._scrollSyncFrameId = null;
+    };
+    this._scrollSyncFrameId = requestAnimationFrame(tick);
+  }
+  /**
+   * Convert wheel delta units into pixels
+   * @param {number} delta
+   * @param {number} deltaMode
+   * @param {'x'|'y'} axis
+   * @returns {number}
+   * @private
+   */
+  _normalizeWheelDelta(delta, deltaMode, axis) {
+    if (deltaMode === 1) {
+      const lineHeight = parseFloat(getComputedStyle(this.textarea).lineHeight) || 16;
+      return delta * lineHeight;
+    }
+    if (deltaMode === 2) {
+      return delta * (axis === "y" ? this.textarea.clientHeight : this.textarea.clientWidth);
+    }
+    return delta;
+  }
+  /**
+   * Handle wheel scrolling directly so preview and textarea move in the same frame
+   * @param {WheelEvent} event
+   * @private
+   */
+  handleWheel(event) {
+    var _a;
+    const mode = (_a = this.container) == null ? void 0 : _a.dataset.mode;
+    if (!this.textarea || !this.preview || mode === "plain" || mode === "preview" || event.ctrlKey)
+      return;
+    const maxTop = Math.max(0, this.textarea.scrollHeight - this.textarea.clientHeight);
+    const maxLeft = Math.max(0, this.textarea.scrollWidth - this.textarea.clientWidth);
+    const deltaY = this._normalizeWheelDelta(event.deltaY, event.deltaMode, "y");
+    const deltaX = this._normalizeWheelDelta(event.deltaX, event.deltaMode, "x");
+    const nextTop = Math.max(0, Math.min(maxTop, this.textarea.scrollTop + deltaY));
+    const nextLeft = Math.max(0, Math.min(maxLeft, this.textarea.scrollLeft + deltaX));
+    const willScrollY = nextTop !== this.textarea.scrollTop;
+    const willScrollX = nextLeft !== this.textarea.scrollLeft;
+    if (!willScrollY && !willScrollX)
+      return;
+    event.preventDefault();
+    this.textarea.scrollTop = nextTop;
+    this.textarea.scrollLeft = nextLeft;
+    this._syncPreviewScroll();
+    this._startScrollSyncLoop();
   }
   /**
    * Create and setup toolbar
@@ -4961,8 +5185,10 @@ var _OverType = class _OverType {
         toolbarButtons2 = [...toolbarButtons2, toolbarButtons.separator, toolbarButtons.upload];
       }
     }
+    toolbarButtons2 = compactToolbarButtons(toolbarButtons2);
     this.toolbar = new Toolbar(this, { toolbarButtons: toolbarButtons2 });
     this.toolbar.create();
+    this.toolbar.updateButtonStates();
     this._toolbarSelectionListener = () => {
       if (this.toolbar) {
         this.toolbar.updateButtonStates();
@@ -5010,6 +5236,7 @@ var _OverType = class _OverType {
    * @private
    */
   _applyOptions() {
+    this._refreshNativeSpellcheck();
     if (this.options.autofocus) {
       this.textarea.focus();
     }
@@ -5020,7 +5247,7 @@ var _OverType = class _OverType {
         this._updateAutoHeight();
       }
     } else {
-      this.container.classList.remove("overtype-auto-resize");
+      this._destroyAutoResize();
     }
     if (this.options.toolbar && !this.toolbar) {
       this._createToolbar();
@@ -5371,8 +5598,8 @@ var _OverType = class _OverType {
    * @private
    */
   handleScroll(event) {
-    this.preview.scrollTop = this.textarea.scrollTop;
-    this.preview.scrollLeft = this.textarea.scrollLeft;
+    this._syncPreviewScroll();
+    this._startScrollSyncLoop();
   }
   /**
    * Get editor content
@@ -5562,6 +5789,61 @@ var _OverType = class _OverType {
     this.updatePreview();
   }
   /**
+   * Enable or disable native browser spellcheck on the textarea
+   * @param {boolean} enabled - Whether spellcheck should be enabled
+   * @returns {this} Returns this for chaining
+   */
+  setSpellcheck(enabled = true) {
+    var _a;
+    const normalized = !!enabled;
+    this.options.spellcheck = normalized;
+    this._refreshNativeSpellcheck();
+    if ((_a = this.toolbar) == null ? void 0 : _a.updateButtonStates) {
+      this.toolbar.updateButtonStates();
+    }
+    if (typeof this.options.onSpellcheckChange === "function") {
+      this.options.onSpellcheckChange(normalized, this);
+    }
+    return this;
+  }
+  /**
+   * Enable or disable auto-resize behavior
+   * @param {boolean} enabled - Whether auto-resize should be enabled
+   * @returns {this} Returns this for chaining
+   */
+  setAutoResize(enabled = true) {
+    var _a;
+    const normalized = !!enabled;
+    const didChange = this.options.autoResize !== normalized;
+    this.options.autoResize = normalized;
+    if (normalized) {
+      this._setupAutoResize();
+    } else {
+      this._destroyAutoResize();
+    }
+    if ((_a = this.toolbar) == null ? void 0 : _a.updateButtonStates) {
+      this.toolbar.updateButtonStates();
+    }
+    if (didChange && typeof this.options.onAutoResizeChange === "function") {
+      this.options.onAutoResizeChange(normalized, this);
+    }
+    return this;
+  }
+  /**
+   * Toggle auto-resize behavior
+   * @returns {this} Returns this for chaining
+   */
+  toggleAutoResize() {
+    return this.setAutoResize(!this.options.autoResize);
+  }
+  /**
+   * Toggle native browser spellcheck on the textarea
+   * @returns {this} Returns this for chaining
+   */
+  toggleSpellcheck() {
+    return this.setSpellcheck(!this.options.spellcheck);
+  }
+  /**
    * Update stats bar
    * @private
    */
@@ -5600,11 +5882,41 @@ var _OverType = class _OverType {
    * @private
    */
   _setupAutoResize() {
+    if (!this._autoResizeInputHandler) {
+      this._autoResizeInputHandler = () => this._updateAutoHeight();
+    }
+    if (!this._autoResizeResizeHandler) {
+      this._autoResizeResizeHandler = () => this._updateAutoHeight();
+    }
+    if (this.container.classList.contains("overtype-auto-resize")) {
+      this._updateAutoHeight();
+      return;
+    }
     this.container.classList.add("overtype-auto-resize");
     this.previousHeight = null;
     this._updateAutoHeight();
-    this.textarea.addEventListener("input", () => this._updateAutoHeight());
-    window.addEventListener("resize", () => this._updateAutoHeight());
+    this.textarea.addEventListener("input", this._autoResizeInputHandler);
+    window.addEventListener("resize", this._autoResizeResizeHandler);
+  }
+  /**
+   * Disable auto-resize behavior and restore default sizing
+   * @private
+   */
+  _destroyAutoResize() {
+    var _a, _b, _c, _d, _e, _f;
+    (_a = this.container) == null ? void 0 : _a.classList.remove("overtype-auto-resize");
+    if (this.textarea && this._autoResizeInputHandler) {
+      this.textarea.removeEventListener("input", this._autoResizeInputHandler);
+    }
+    if (this._autoResizeResizeHandler) {
+      window.removeEventListener("resize", this._autoResizeResizeHandler);
+    }
+    (_b = this.wrapper) == null ? void 0 : _b.style.removeProperty("height");
+    (_c = this.preview) == null ? void 0 : _c.style.removeProperty("height");
+    (_d = this.preview) == null ? void 0 : _d.style.removeProperty("overflow-y");
+    (_e = this.textarea) == null ? void 0 : _e.style.removeProperty("height");
+    (_f = this.textarea) == null ? void 0 : _f.style.removeProperty("overflow-y");
+    this.previousHeight = null;
   }
   /**
    * Update height based on scrollHeight
@@ -5658,18 +5970,35 @@ var _OverType = class _OverType {
    * @param {boolean} show - Whether to show stats
    */
   showStats(show) {
-    this.options.showStats = show;
-    if (show && !this.statsBar) {
+    var _a;
+    const normalized = !!show;
+    const didChange = this.options.showStats !== normalized;
+    this.options.showStats = normalized;
+    if (normalized && !this.statsBar) {
       this.statsBar = document.createElement("div");
       this.statsBar.className = "overtype-stats";
       this.container.appendChild(this.statsBar);
       this._updateStats();
-    } else if (show && this.statsBar) {
+    } else if (normalized && this.statsBar) {
       this._updateStats();
-    } else if (!show && this.statsBar) {
+    } else if (!normalized && this.statsBar) {
       this.statsBar.remove();
       this.statsBar = null;
     }
+    if ((_a = this.toolbar) == null ? void 0 : _a.updateButtonStates) {
+      this.toolbar.updateButtonStates();
+    }
+    if (didChange && typeof this.options.onShowStatsChange === "function") {
+      this.options.onShowStatsChange(normalized, this);
+    }
+    return this;
+  }
+  /**
+   * Toggle stats bar visibility
+   * @returns {this} Returns this for chaining
+   */
+  toggleStats() {
+    return this.showStats(!this.options.showStats);
   }
   /**
    * Show normal edit mode (overlay with markdown preview)
@@ -5677,6 +6006,7 @@ var _OverType = class _OverType {
    */
   showNormalEditMode() {
     this.container.dataset.mode = "normal";
+    this._refreshNativeSpellcheck();
     this.updatePreview();
     this._updateAutoHeight();
     requestAnimationFrame(() => {
@@ -5691,6 +6021,7 @@ var _OverType = class _OverType {
    */
   showPlainTextarea() {
     this.container.dataset.mode = "plain";
+    this._refreshNativeSpellcheck();
     this._updateAutoHeight();
     if (this.toolbar) {
       const toggleBtn = this.container.querySelector('[data-action="toggle-plain"]');
@@ -5707,6 +6038,7 @@ var _OverType = class _OverType {
    */
   showPreviewMode() {
     this.container.dataset.mode = "preview";
+    this._refreshNativeSpellcheck();
     this.updatePreview();
     this._updateAutoHeight();
     return this;
@@ -5717,6 +6049,8 @@ var _OverType = class _OverType {
   destroy() {
     _OverType._autoInstances.delete(this);
     _OverType._stopAutoListener();
+    this._stopScrollSyncLoop();
+    this._destroyAutoResize();
     if (this.fileUploadInitialized) {
       this._destroyFileUpload();
     }
@@ -5971,6 +6305,14 @@ var _OverType = class _OverType {
           instance.handleScroll(e);
       }
     }, true);
+    document.addEventListener("wheel", (e) => {
+      if (e.target && e.target.classList && e.target.classList.contains("overtype-input")) {
+        const wrapper = e.target.closest(".overtype-wrapper");
+        const instance = wrapper == null ? void 0 : wrapper._instance;
+        if (instance)
+          instance.handleWheel(e);
+      }
+    }, { capture: true, passive: false });
     document.addEventListener("selectionchange", (e) => {
       const activeElement = document.activeElement;
       if (activeElement && activeElement.classList.contains("overtype-input")) {
@@ -6007,15 +6349,20 @@ OverType.themes = { solar, cave: getTheme("cave") };
 OverType.getTheme = getTheme;
 OverType.currentTheme = solar;
 var overtype_default = OverType;
-export {
+
+// src/v-markdown-input.js
+var VMarkdownInput = overtype_default;
+var v_markdown_input_default = VMarkdownInput;
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
   OverType,
-  overtype_default as default,
+  VMarkdownInput,
   defaultToolbarButtons,
   toolbarButtons
-};
+});
 /**
  * OverType - A lightweight markdown editor library with perfect WYSIWYG alignment
  * @version 1.0.0
  * @license MIT
  */
-//# sourceMappingURL=overtype.esm.js.map
+//# sourceMappingURL=v-markdown-input.cjs.map

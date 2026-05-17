@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>v-markdown-input Demo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #f5efe3;
+      --panel: rgba(255, 252, 246, 0.88);
+      --panel-strong: rgba(255, 248, 238, 0.96);
+      --ink: #241b16;
+      --muted: #6d5a4e;
+      --line: rgba(64, 42, 28, 0.14);
+      --accent: #b4492f;
+      --accent-2: #0c6b62;
+      --shadow: 0 22px 70px rgba(64, 42, 28, 0.16);
+      --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      --sans: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--sans);
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(180, 73, 47, 0.12), transparent 26%),
+        radial-gradient(circle at top right, rgba(12, 107, 98, 0.16), transparent 24%),
+        linear-gradient(180deg, #fffdf7 0%, #f4ecdf 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(64, 42, 28, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(64, 42, 28, 0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent 85%);
+    }
+
+    .shell {
+      width: min(1440px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+      position: relative;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .hero-card,
+    .stack,
+    .panel,
+    .inspector {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+    }
+
+    .hero-card {
+      padding: 26px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      top: -70px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(180, 73, 47, 0.28), transparent 70%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(180, 73, 47, 0.1);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 16px 0 12px;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      max-width: 12ch;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 62ch;
+    }
+
+    .credit {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .stack {
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--panel-strong);
+      border: 1px solid rgba(64, 42, 28, 0.08);
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.75fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+      margin-bottom: 14px;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-subtitle {
+      margin: 4px 0 0;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .field,
+    .toggle {
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(64, 42, 28, 0.08);
+      background: var(--panel-strong);
+    }
+
+    .field label,
+    .toggle label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    select,
+    button,
+    textarea,
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid rgba(64, 42, 28, 0.12);
+      border-radius: 14px;
+      background: #fffdfa;
+      color: var(--ink);
+      font: inherit;
+      padding: 10px 12px;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(64, 42, 28, 0.24);
+    }
+
+    .toggle-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .toggle label {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.86rem;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .toggle input {
+      accent-color: var(--accent);
+      inline-size: 18px;
+      block-size: 18px;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .button-grid button,
+    .preset-grid button {
+      min-height: 44px;
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .accent {
+      background: linear-gradient(135deg, rgba(180, 73, 47, 0.16), rgba(180, 73, 47, 0.08));
+    }
+
+    .secondary {
+      background: linear-gradient(135deg, rgba(12, 107, 98, 0.16), rgba(12, 107, 98, 0.08));
+    }
+
+    .editor-frame {
+      padding: 14px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(253, 248, 241, 0.9));
+      border: 1px solid rgba(64, 42, 28, 0.08);
+    }
+
+    #editor {
+      display: block;
+      width: 100%;
+    }
+
+    .inspector {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .surface {
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--panel-strong);
+      border: 1px solid rgba(64, 42, 28, 0.08);
+    }
+
+    .surface h3 {
+      margin: 0 0 10px;
+      font-size: 0.92rem;
+      letter-spacing: -0.02em;
+    }
+
+    .surface-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .surface-head h3 {
+      margin: 0;
+    }
+
+    .log,
+    .code-output,
+    .snippet-output {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      margin: 0;
+      color: var(--ink);
+    }
+
+    .log {
+      max-height: 240px;
+      overflow: auto;
+    }
+
+    .code-output,
+    .snippet-output {
+      max-height: 420px;
+      overflow: auto;
+    }
+
+    .copy-button {
+      width: auto;
+      min-width: 110px;
+      padding-inline: 14px;
+      background: linear-gradient(135deg, rgba(12, 107, 98, 0.16), rgba(12, 107, 98, 0.08));
+    }
+
+    .credits {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1180px) {
+      .hero,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .inspector {
+        position: static;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .controls,
+      .toggle-row,
+      .button-grid,
+      .preset-grid,
+      .metric-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .shell {
+        width: min(100vw - 18px, 100%);
+        padding: 18px 0 24px;
+      }
+
+      .hero-card,
+      .stack,
+      .panel,
+      .inspector {
+        border-radius: 20px;
+      }
+
+      .controls,
+      .toggle-row,
+      .button-grid,
+      .preset-grid,
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <article class="hero-card">
+        <span class="eyebrow">Standalone Extraction</span>
+        <h1>v-markdown-input</h1>
+        <p>
+          A self-contained web component scaffold derived from OverType, with the original MIT
+          license and credits preserved. This demo uses the component's built-in Shiki loading,
+          exposes the component API, and keeps advanced editor options available for a later repo
+          split.
+        </p>
+        <div class="credit">
+          Derived from <strong>OverType</strong> by <strong>David Miranda</strong>. This folder keeps
+          the original license intact and explicitly credits the upstream project in code, build
+          artifacts, and docs.
+        </div>
+      </article>
+
+      <aside class="stack">
+        <div class="metric-grid">
+          <div class="metric">
+            <div class="metric-label">Custom Element</div>
+            <strong>&lt;v-markdown-input&gt;</strong>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Syntax Engine</div>
+            <strong id="shiki-status">Booting…</strong>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Current Mode</div>
+            <strong id="mode-status">normal</strong>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Words</div>
+            <strong id="word-status">0</strong>
+          </div>
+        </div>
+        <div class="credits">
+          Use the toolbar upload button, drag files onto the editor, or paste images and text files.
+          The demo re-applies advanced options automatically when the component is reinitialized by
+          attribute changes.
+        </div>
+      </aside>
+    </section>
+
+    <section class="workspace">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Workbench</h2>
+            <p class="panel-subtitle">Attributes, modes, built-in syntax highlighting, uploads, exports.</p>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="field">
+            <label for="theme">Theme</label>
+            <select id="theme">
+              <option value="solar">solar</option>
+              <option value="cave">cave</option>
+              <option value="auto">auto</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="mode">Mode</label>
+            <select id="mode">
+              <option value="normal">normal</option>
+              <option value="preview">preview</option>
+              <option value="plain">plain</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="height">Height</label>
+            <select id="height">
+              <option value="420px">420px</option>
+              <option value="560px">560px</option>
+              <option value="680px">680px</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="max-height">Max Height</label>
+            <select id="max-height">
+              <option value="">none</option>
+              <option value="560px">560px</option>
+              <option value="720px" selected>720px</option>
+              <option value="900px">900px</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="font-size">Font Size</label>
+            <select id="font-size">
+              <option value="13px">13px</option>
+              <option value="14px">14px</option>
+              <option value="16px">16px</option>
+              <option value="18px">18px</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="padding">Padding</label>
+            <select id="padding">
+              <option value="12px">12px</option>
+              <option value="16px">16px</option>
+              <option value="20px">20px</option>
+              <option value="24px">24px</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="insert-text">Insert Text</label>
+            <input id="insert-text" type="text" value="`// injected from API`">
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle"><label><input id="toolbar" type="checkbox" checked>Toolbar</label></div>
+          <div class="toggle"><label><input id="stats" type="checkbox" checked>Stats</label></div>
+          <div class="toggle"><label><input id="auto-resize" type="checkbox">Auto Resize</label></div>
+          <div class="toggle"><label><input id="readonly" type="checkbox">Readonly</label></div>
+          <div class="toggle"><label><input id="spellcheck" type="checkbox">Spellcheck</label></div>
+          <div class="toggle"><label><input id="smart-lists" type="checkbox" checked>Smart Lists</label></div>
+          <div class="toggle"><label><input id="syntax-highlighting" type="checkbox" checked>Syntax Highlighting</label></div>
+          <div class="toggle"><label><input id="active-line-raw" type="checkbox">Show Current Line Markdown</label></div>
+        </div>
+
+        <div class="preset-grid">
+          <button class="accent" id="preset-full">Load Full Demo</button>
+          <button class="secondary" id="preset-web">Load Web Stack</button>
+          <button id="preset-notes">Load Product Notes</button>
+        </div>
+
+        <div class="button-grid">
+          <button id="action-html">Rendered HTML</button>
+          <button id="action-clean">Clean HTML</button>
+          <button id="action-preview-html">Preview HTML</button>
+          <button id="action-stats">Stats</button>
+          <button id="action-focus">Focus</button>
+          <button id="action-insert">Insert Text</button>
+          <button id="action-toolbar">Toggle Toolbar</button>
+          <button id="action-timestamp">Insert Timestamp</button>
+        </div>
+
+        <div class="editor-frame">
+          <v-markdown-input
+            id="editor"
+            theme="solar"
+            mode="normal"
+            height="560px"
+            max-height="720px"
+            font-size="14px"
+            padding="16px"
+            toolbar
+            show-stats>
+          </v-markdown-input>
+        </div>
+      </section>
+
+      <aside class="inspector">
+        <section class="surface">
+          <div class="surface-head">
+            <h3>Copy-Paste Snippet</h3>
+            <button id="copy-snippet" class="copy-button">Copy Snippet</button>
+          </div>
+          <pre id="snippet-output" class="snippet-output">The live integration snippet will appear here.</pre>
+        </section>
+
+        <section class="surface">
+          <h3>Event Log</h3>
+          <pre id="event-log" class="log">Waiting for component events…</pre>
+        </section>
+
+        <section class="surface">
+          <h3>Inspector Output</h3>
+          <pre id="output" class="code-output">Choose an action to inspect HTML, preview output, or stats.</pre>
+        </section>
+
+        <section class="surface">
+          <h3>Credits</h3>
+          <div class="credits">
+            This standalone scaffold preserves the original MIT license and credits OverType by David
+            Miranda. It is intentionally structured as a vendored extraction so it can be moved into a
+            separate repository later without losing provenance.
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script type="module" src="./dist/v-markdown-input-webcomponent.esm.js"></script>
+  <script type="module" src="./demo.js"></script>
+</body>
+</html>
