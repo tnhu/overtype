@@ -332,16 +332,7 @@ class OverType {
       // Store reference on wrapper
       this.wrapper._instance = this;
       
-      // Apply instance-specific styles via CSS custom properties
-      if (this.options.fontSize) {
-        this.wrapper.style.setProperty('--instance-font-size', this.options.fontSize);
-      }
-      if (this.options.lineHeight) {
-        this.wrapper.style.setProperty('--instance-line-height', String(this.options.lineHeight));
-      }
-      if (this.options.padding) {
-        this.wrapper.style.setProperty('--instance-padding', this.options.padding);
-      }
+      this._applyInstanceStyles();
 
       // Configure native text input helpers and extension hints
       this._configureTextarea();
@@ -416,16 +407,7 @@ class OverType {
       this.wrapper.className = 'overtype-wrapper';
       
       
-      // Apply instance-specific styles via CSS custom properties
-      if (this.options.fontSize) {
-        this.wrapper.style.setProperty('--instance-font-size', this.options.fontSize);
-      }
-      if (this.options.lineHeight) {
-        this.wrapper.style.setProperty('--instance-line-height', String(this.options.lineHeight));
-      }
-      if (this.options.padding) {
-        this.wrapper.style.setProperty('--instance-padding', this.options.padding);
-      }
+      this._applyInstanceStyles();
       
       this.wrapper._instance = this;
 
@@ -487,6 +469,27 @@ class OverType {
         // Ensure auto-resize class is removed if not using auto-resize
         this.container.classList.remove('overtype-auto-resize');
       }
+    }
+
+    /**
+     * Apply per-instance typography and spacing CSS variables
+     * @private
+     */
+    _applyInstanceStyles() {
+      if (!this.wrapper) return;
+
+      [
+        ['--instance-font-size', this.options.fontSize],
+        ['--instance-font-family', this.options.fontFamily],
+        ['--instance-line-height', this.options.lineHeight ? String(this.options.lineHeight) : ''],
+        ['--instance-padding', this.options.padding]
+      ].forEach(([property, value]) => {
+        if (value) {
+          this.wrapper.style.setProperty(property, value);
+        } else {
+          this.wrapper.style.removeProperty(property);
+        }
+      });
     }
 
     /**
@@ -1337,6 +1340,7 @@ class OverType {
     reinit(options = {}) {
       const prevToolbarButtons = this.options?.toolbarButtons;
       this.options = this._mergeOptions({ ...this.options, ...options });
+      this._applyInstanceStyles();
       const toolbarNeedsRebuild = this.toolbar &&
         this.options.toolbar &&
         toolbarButtonsChanged(prevToolbarButtons, this.options.toolbarButtons);

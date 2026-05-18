@@ -123,7 +123,7 @@ export function generateStyles(options = {}) {
       height: 100% !important;
       
       /* Font properties - any difference breaks alignment */
-      font-family: ${fontFamily} !important;
+      font-family: var(--instance-font-family, ${fontFamily}) !important;
       font-variant-ligatures: none !important; /* keep metrics stable for code */
       font-size: var(--instance-font-size, ${fontSize}) !important;
       line-height: var(--instance-line-height, ${lineHeight}) !important;
@@ -230,7 +230,7 @@ export function generateStyles(options = {}) {
       z-index: 0 !important;
       pointer-events: none !important;
       user-select: none !important;
-      font-family: ${fontFamily} !important;
+      font-family: var(--instance-font-family, ${fontFamily}) !important;
       font-size: var(--instance-font-size, ${fontSize}) !important;
       line-height: var(--instance-line-height, ${lineHeight}) !important;
       padding: var(--instance-padding, ${padding}) !important;
@@ -391,7 +391,7 @@ export function generateStyles(options = {}) {
     .overtype-wrapper .overtype-preview pre code {
       background: transparent !important;
       color: var(--code, #0d3b66) !important;
-      font-family: ${fontFamily} !important; /* Match textarea font exactly for alignment */
+      font-family: var(--instance-font-family, ${fontFamily}) !important; /* Match textarea font exactly for alignment */
     }
 
     /* Blockquotes */
@@ -816,7 +816,7 @@ export function generateStyles(options = {}) {
       background: transparent !important;
       color: inherit !important;
       padding: 0 !important;
-      font-family: ${fontFamily} !important;
+      font-family: var(--instance-font-family, ${fontFamily}) !important;
       font-size: 0.9em !important;
       line-height: 1.4 !important;
     }
@@ -851,7 +851,7 @@ export function generateStyles(options = {}) {
 
     /* Inline code in preview mode - keep monospace */
     .overtype-container[data-mode="preview"] .overtype-wrapper .overtype-preview code {
-      font-family: ${fontFamily} !important;
+      font-family: var(--instance-font-family, ${fontFamily}) !important;
       font-size: 0.9em !important;
       background: var(--preview-code-bg, var(--preview-code-bg-default)) !important;
       color: var(--preview-code, var(--preview-code-default)) !important;

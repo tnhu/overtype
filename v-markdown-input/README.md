@@ -61,6 +61,7 @@ The custom element mirrors the current OverType wrapper and supports these react
 - `max-height`
 - `placeholder`
 - `font-size`
+- `font-family`
 - `line-height`
 - `padding`
 - `auto-resize`
@@ -75,6 +76,14 @@ The custom element mirrors the current OverType wrapper and supports these react
 Add `spellcheck` to enable the native browser spellchecker. In normal overlay mode the component uses aggressive scroll syncing to keep native spellcheck underlines aligned with the preview layer, but exact rendering still depends on browser behavior. Use `syntax-highlighting="false"` to disable the built-in Shiki loader. `show-active-line-raw` renders the line under the caret as literal markdown instead of parsed preview.
 
 When `auto-resize` is enabled, use `max-height="720px"` or another CSS pixel value to cap growth and switch the editor body to scrolling after that height.
+
+Use `font-family` to switch the editor typography. The value is applied to the textarea, preview overlay, inline code, fenced code blocks, and Shiki-highlighted spans through inheritance:
+
+```html
+<v-markdown-input
+  font-family='ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'>
+</v-markdown-input>
+```
 
 ## Public API
 

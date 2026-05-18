@@ -118,12 +118,14 @@ const shikiStatus = document.getElementById("shiki-status");
 const modeStatus = document.getElementById("mode-status");
 const wordStatus = document.getElementById("word-status");
 const copySnippetButton = document.getElementById("copy-snippet");
+const STANDARD_MONO_FONT = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
 const controls = {
   theme: document.getElementById("theme"),
   mode: document.getElementById("mode"),
   height: document.getElementById("height"),
   maxHeight: document.getElementById("max-height"),
   fontSize: document.getElementById("font-size"),
+  fontFamily: document.getElementById("font-family"),
   padding: document.getElementById("padding"),
   insertText: document.getElementById("insert-text"),
   toolbar: document.getElementById("toolbar"),
@@ -146,6 +148,9 @@ function log(line) {
 }
 function escapeHtml(value) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function escapeAttribute(value) {
+  return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 }
 function updateSyntaxStatus(status = component.getSyntaxHighlightingStatus?.()) {
   if (!status) {
@@ -236,6 +241,7 @@ function getComponentAttributes() {
   const height = component.getAttribute("height");
   const maxHeight = component.getAttribute("max-height");
   const fontSize = component.getAttribute("font-size");
+  const fontFamily = component.getAttribute("font-family");
   const padding = component.getAttribute("padding");
   if (theme && theme !== "solar")
     attributes.push(`theme="${theme}"`);
@@ -247,6 +253,8 @@ function getComponentAttributes() {
     attributes.push(`max-height="${maxHeight}"`);
   if (fontSize && fontSize !== "14px")
     attributes.push(`font-size="${fontSize}"`);
+  if (fontFamily)
+    attributes.push(`font-family="${escapeAttribute(fontFamily)}"`);
   if (padding && padding !== "16px")
     attributes.push(`padding="${padding}"`);
   if (component.hasAttribute("toolbar"))
@@ -301,6 +309,7 @@ function applyControlState() {
   component.setAttribute("theme", controls.theme.value);
   component.setAttribute("mode", controls.mode.value);
   component.setAttribute("font-size", controls.fontSize.value);
+  component.setAttribute("font-family", controls.fontFamily.value);
   component.setAttribute("padding", controls.padding.value);
   if (controls.maxHeight.value) {
     component.setAttribute("max-height", controls.maxHeight.value);
@@ -349,6 +358,7 @@ function syncControlsFromComponent() {
   controls.height.value = component.getAttribute("height") || "560px";
   controls.maxHeight.value = component.getAttribute("max-height") || "";
   controls.fontSize.value = component.getAttribute("font-size") || "14px";
+  controls.fontFamily.value = component.getAttribute("font-family") || STANDARD_MONO_FONT;
   controls.padding.value = component.getAttribute("padding") || "16px";
   controls.toolbar.checked = component.hasAttribute("toolbar");
   controls.stats.checked = component.hasAttribute("show-stats");
@@ -383,6 +393,7 @@ controls.mode.addEventListener("change", applyControlState);
 controls.height.addEventListener("change", applyControlState);
 controls.maxHeight.addEventListener("change", applyControlState);
 controls.fontSize.addEventListener("change", applyControlState);
+controls.fontFamily.addEventListener("change", applyControlState);
 controls.padding.addEventListener("change", applyControlState);
 controls.toolbar.addEventListener("change", applyControlState);
 controls.stats.addEventListener("change", applyControlState);

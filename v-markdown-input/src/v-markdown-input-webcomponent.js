@@ -17,7 +17,7 @@ const SHIKI_FALLBACK_CDN_URL = `https://esm.run/shiki@${SHIKI_VERSION}`;
 const MAX_HIGHLIGHT_CACHE_ENTRIES = 200;
 const OBSERVED_ATTRIBUTES = [
   'value', 'theme', 'toolbar', 'height', 'min-height', 'max-height',
-  'placeholder', 'font-size', 'line-height', 'padding', 'auto-resize',
+  'placeholder', 'font-size', 'font-family', 'line-height', 'padding', 'auto-resize',
   'autofocus', 'show-stats', 'smart-lists', 'readonly', 'spellcheck',
   'syntax-highlighting', 'show-active-line-raw', 'mode'
 ];
@@ -492,6 +492,9 @@ class VMarkdownInputElement extends HTMLElement {
     const fontSize = this.getAttribute('font-size');
     if (fontSize) options.fontSize = fontSize;
 
+    const fontFamily = this.getAttribute('font-family');
+    if (fontFamily) options.fontFamily = fontFamily;
+
     const lineHeight = this.getAttribute('line-height');
     if (lineHeight) options.lineHeight = parseFloat(lineHeight) || 1.6;
 
@@ -589,6 +592,11 @@ class VMarkdownInputElement extends HTMLElement {
         break;
       case 'font-size':
         if (this._updateFontSize(value)) {
+          this._reinjectStyles();
+        }
+        break;
+      case 'font-family':
+        if (this._updateFontFamily(value)) {
           this._reinjectStyles();
         }
         break;
@@ -696,6 +704,19 @@ class VMarkdownInputElement extends HTMLElement {
     if (!this._editor?.wrapper) return false;
     this._editor.options.fontSize = value || '';
     this._editor.wrapper.style.setProperty('--instance-font-size', this._editor.options.fontSize);
+    this._editor.updatePreview();
+    return true;
+  }
+
+  _updateFontFamily(value) {
+    if (!this._editor?.wrapper) return false;
+    this._editor.options.fontFamily = value || '';
+    if (value) {
+      this._editor.wrapper.style.setProperty('--instance-font-family', value);
+    } else {
+      this._editor.wrapper.style.removeProperty('--instance-font-family');
+    }
+    this._clearInternalHighlightCache();
     this._editor.updatePreview();
     return true;
   }

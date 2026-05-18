@@ -516,6 +516,13 @@
             </select>
           </div>
           <div class="field">
+            <label for="font-family">Font Family</label>
+            <select id="font-family">
+              <option value='ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'>standard mono stack</option>
+              <option value='ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'>standard non-mono stack</option>
+            </select>
+          </div>
+          <div class="field">
             <label for="padding">Padding</label>
             <select id="padding">
               <option value="12px">12px</option>
@@ -566,6 +573,7 @@
             height="560px"
             max-height="720px"
             font-size="14px"
+            font-family='ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
             padding="16px"
             toolbar
             show-stats>
